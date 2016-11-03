@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 
-SAMPLING_RATE = 100 # HZ
+SAMPLING_RATE = 200 # HZ
 T = 1 # assume sampling period is 1 for now to avoid multiplying by small decimal
 
 # IMPORTANT NOTE: THIS ALGORITHM WAS TESTED ON THE WIIMOTE USING A MODEL THAT 
@@ -26,6 +26,8 @@ def dead_reckoning():
 
 	accel_matrix = np.array(accel_matrix)
 	print('Number of samples: ', num_samples)
+	print('Acceleration Matrix:')
+	print(accel_matrix)
 
 	######### Populate the velocity data ############
 	velocity_matrix = np.empty((num_samples, 3))
@@ -33,8 +35,11 @@ def dead_reckoning():
 	velocity_matrix[0] = np.array([0,0,0]) # initial velocity. Assume starting at rest
 
 	for i in range(1, num_samples):
-		velocity_vector = velocity_matrix[i] + ((accel_matrix[i] - accel_matrix[i - 1]) / 2) * T 
+		velocity_vector = velocity_matrix[i - 1] + accel_matrix[i - 1, :3] + ((accel_matrix[i, :3] - accel_matrix[i - 1, :3]) / 2.0) * T 
 		velocity_matrix[i] = np.array(velocity_vector)
+
+	print('Velocity Matrix:')
+	print(velocity_matrix)
 
 	######### Populate the position data ############
 	position_matrix = np.empty((num_samples, 3))
@@ -42,8 +47,11 @@ def dead_reckoning():
 	position_matrix[0] = np.array([0,0,0]) # initial position. Assume starting at origin
 
 	for i in range(1, num_samples):
-		position_vector = position_matrix[i] + ((velocity_matrix[i] - velocity_matrix[i - 1]) / 2) * T 
+		position_vector = position_matrix[i - 1] + velocity_matrix[i - 1] + ((velocity_matrix[i] - velocity_matrix[i - 1]) / 2.0) * T 
 		position_matrix[i] = np.array(position_vector)
+
+	print('Position Matrix:')
+	print(position_matrix)
 
 dead_reckoning()
 
