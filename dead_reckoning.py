@@ -1,23 +1,49 @@
 import sys
+import numpy as np
 
 SAMPLING_RATE = 100 # HZ
+T = 1 # assume sampling period is 1 for now to avoid multiplying by small decimal
 
+# IMPORTANT NOTE: THIS ALGORITHM WAS TESTED ON THE WIIMOTE USING A MODEL THAT 
+# PRE-ADJUSTS FOR BIAS AND SENSITIVITY IN THE SENSOR. THEREFORE, NO CALIBRATION 
+# NEED BE PERFORMED. IMPLEMENTATION FOR OTHER SENSORS MUST DO ADDITIONAL WORK TO CALIBRATE.
 def dead_reckoning():
 	file_path = sys.argv[1]
 	print('filepath:', file_path)
 	f = open(file_path, 'r')
 
+	######### Populate the accel data ############
 	#[x, y, z, pitch, roll]
 	accel_matrix = []
+	num_samples = 0
 
 	for line in f:
+		num_samples += 1 #running count of number of samples
 		line = line[:-1]
 		accel_vector = line.split(',')
 		accel_vector = list(map(float, accel_vector))
 		accel_matrix.append(accel_vector)
 
-	print('Number of samples: ', len(accel_matrix))
+	accel_matrix = np.array(accel_matrix)
+	print('Number of samples: ', num_samples)
 
+	######### Populate the velocity data ############
+	velocity_matrix = np.empty((num_samples, 3))
+	print('velocity matrix dimensions: ', velocity_matrix.shape)
+	velocity_matrix[0] = np.array([0,0,0]) # initial velocity. Assume starting at rest
+
+	for i in range(1, num_samples):
+		velocity_vector = velocity_matrix[i] + ((accel_matrix[i] - accel_matrix[i - 1]) / 2) * T 
+		velocity_matrix[i] = np.array(velocity_vector)
+
+	######### Populate the position data ############
+	position_matrix = np.empty((num_samples, 3))
+	print('position matrix dimensions: ', position_matrix.shape)
+	position_matrix[0] = np.array([0,0,0]) # initial position. Assume starting at origin
+
+	for i in range(1, num_samples):
+		position_vector = position_matrix[i] + ((velocity_matrix[i] - velocity_matrix[i - 1]) / 2) * T 
+		position_matrix[i] = np.array(position_vector)
 
 dead_reckoning()
 
