@@ -7,7 +7,9 @@ def dead_reckoning():
 	print('filepath:', file_path)
 	f = open(file_path, 'r')
 
+	#[x, y, z, pitch, roll]
 	accel_matrix = []
+
 	for line in f:
 		line = line[:-1]
 		accel_vector = line.split(',')
@@ -16,7 +18,7 @@ def dead_reckoning():
 
 	print('Number of samples: ', len(accel_matrix))
 
-	
+
 dead_reckoning()
 
 
