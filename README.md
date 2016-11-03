@@ -1,0 +1,2 @@
+# air-doodle
+This project aims to develop a device that uses a small micro controller with accelerometer and gyro mounted in a wearable glove in order to classify and recognize digits, characters, and gestures traced out in physical 3-space by the user. This will be realized by a continuous data stream to a remote server running a pre-trained classifier. Classification data will drive the display of an LED grid with scrolling displays (because, why not?!)
