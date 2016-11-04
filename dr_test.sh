@@ -1,0 +1,1 @@
+python dead_reckoning.py accel_data_collection/00.txt position_data.txt

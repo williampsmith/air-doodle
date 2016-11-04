@@ -8,16 +8,15 @@ T = 1 # assume sampling period is 1 for now to avoid multiplying by small decima
 # PRE-ADJUSTS FOR BIAS AND SENSITIVITY IN THE SENSOR. THEREFORE, NO CALIBRATION 
 # NEED BE PERFORMED. IMPLEMENTATION FOR OTHER SENSORS MUST DO ADDITIONAL WORK TO CALIBRATE.
 def dead_reckoning():
-	file_path = sys.argv[1]
-	print('filepath:', file_path)
-	f = open(file_path, 'r')
+	f_read = open(sys.argv[1], 'r')
+	#f_write = open(sys.argv[2], 'w')
 
 	######### Populate the accel data ############
 	#[x, y, z, pitch, roll]
 	accel_matrix = []
 	num_samples = 0
 
-	for line in f:
+	for line in f_read:
 		num_samples += 1 #running count of number of samples
 		line = line[:-1]
 		accel_vector = line.split(',')
@@ -35,7 +34,7 @@ def dead_reckoning():
 	velocity_matrix[0] = np.array([0,0,0]) # initial velocity. Assume starting at rest
 
 	for i in range(1, num_samples):
-		velocity_vector = velocity_matrix[i - 1] + accel_matrix[i - 1, :3] + ((accel_matrix[i, :3] - accel_matrix[i - 1, :3]) / 2.0) * T 
+		velocity_vector = velocity_matrix[i - 1] + accel_matrix[i - 1, :3] + np.abs(((accel_matrix[i, :3] - accel_matrix[i - 1, :3])) / 2.0) * T 
 		velocity_matrix[i] = np.array(velocity_vector)
 
 	print('Velocity Matrix:')
@@ -47,11 +46,13 @@ def dead_reckoning():
 	position_matrix[0] = np.array([0,0,0]) # initial position. Assume starting at origin
 
 	for i in range(1, num_samples):
-		position_vector = position_matrix[i - 1] + velocity_matrix[i - 1] + ((velocity_matrix[i] - velocity_matrix[i - 1]) / 2.0) * T 
+		position_vector = position_matrix[i - 1] + velocity_matrix[i - 1] + np.abs(((velocity_matrix[i] - velocity_matrix[i - 1])) / 2.0) * T 
 		position_matrix[i] = np.array(position_vector)
 
 	print('Position Matrix:')
 	print(position_matrix)
+
+	np.savetxt(sys.argv[2], position_matrix) # write text to a file
 
 dead_reckoning()
 
