@@ -6,13 +6,15 @@ T = 1 # assume sampling period is 1 for now to avoid multiplying by small decima
 
 # IMPORTANT NOTE: THIS ALGORITHM WAS TESTED ON THE WIIMOTE USING A MODEL THAT 
 # PRE-ADJUSTS FOR BIAS AND SENSITIVITY IN THE SENSOR. THEREFORE, NO CALIBRATION 
-# NEED BE PERFORMED. IMPLEMENTATION FOR OTHER SENSORS MUST DO ADDITIONAL WORK TO CALIBRATE.
+# NEED BE PERFORMED. IMPLEMENTATION FOR OTHER SENSORS MUST DO ADDITIONAL WORK TO 
+# CALIBRATE. DATA IS ALSO ALREADY LOW-PASS FILTERED. THIS WILL ALSO NEED TO BE 
+# IMPLEMENTED IN THE MORE GENERAL ALGORITHM.
 def dead_reckoning():
 	f_read = open(sys.argv[1], 'r')
 	#f_write = open(sys.argv[2], 'w')
 
 	######### Populate the accel data ############
-	#[x, y, z, pitch, roll]
+	#[x, y, z, roll, pitch]
 	accel_matrix = []
 	num_samples = 0
 
@@ -27,6 +29,14 @@ def dead_reckoning():
 	print('Number of samples: ', num_samples)
 	print('Acceleration Matrix:')
 	print(accel_matrix)
+
+	######### Condition accelerometer data by removing gravity vector from all mesaurements ############
+	for i in range(num_samples):
+		x, y, z, roll, pitch = accel_matrix[i]
+		roll = roll * np.pi / 180.0
+		pitch = pitch * np.pi / 180.0
+		accel_matrix[i] = np.array([x, y - np.sin(roll), z - np.cos(roll), roll, pitch]) # checkme
+
 
 	######### Populate the velocity data ############
 	velocity_matrix = np.empty((num_samples, 3))
@@ -51,8 +61,27 @@ def dead_reckoning():
 
 	print('Position Matrix:')
 	print(position_matrix)
-
 	np.savetxt(sys.argv[2], position_matrix) # write text to a file
+
+	return position_matrix
+
+
+# performs SVD and PCA on matrix to project onto 2D writing surface
+def project(position_matrix):
+	# subtract the mean from each dimension
+	dimension_len, vector_len = np.size(position_matrix)
+	for column in range(vector_len):
+		v = position_matrix[:, column]
+		mean = v.sum() / float(dimension_len)
+		print(mean)
+		v = v - mean
+		position_matrix[:, column] = v
+
+	U,S,V = np.linalg.svd(position_matrix)
+	result = V[:, :2].T.dot(position_matrix.T)
+	result = result.T
+
+	return result # 2D projection
 
 dead_reckoning()
 
