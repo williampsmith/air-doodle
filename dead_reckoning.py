@@ -1,8 +1,10 @@
 import sys
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 SAMPLING_RATE = 200 # HZ
-T = 1 # assume sampling period is 1 for now to avoid multiplying by small decimal
+T = 100 # assume sampling period is 1 for now to avoid multiplying by small decimal
 
 # IMPORTANT NOTE: THIS ALGORITHM WAS TESTED ON THE WIIMOTE USING A MODEL THAT 
 # PRE-ADJUSTS FOR BIAS AND SENSITIVITY IN THE SENSOR. THEREFORE, NO CALIBRATION 
@@ -61,7 +63,18 @@ def dead_reckoning():
 
 	print('Position Matrix:')
 	print(position_matrix)
-	np.savetxt(sys.argv[2], position_matrix) # write text to a file
+	np.savetxt(sys.argv[2], position_matrix, delimiter=",") # write text to a file
+
+	######### Plot 3D position data ############
+	fig = plt.figure()
+	ax = fig.add_subplot(111, projection='3d')
+	ax.scatter(position_matrix[::,0], position_matrix[::,1], position_matrix[::,2], depthshade=True)
+	plt.show()
+
+	######### Plot 2D projected position data ############
+	pos2D = project(position_matrix)
+	plt.plot(pos2D[:,0], pos2D[:,1])
+	plt.show()
 
 	return position_matrix
 
@@ -69,7 +82,7 @@ def dead_reckoning():
 # performs SVD and PCA on matrix to project onto 2D writing surface
 def project(position_matrix):
 	# subtract the mean from each dimension
-	dimension_len, vector_len = np.size(position_matrix)
+	dimension_len, vector_len = np.shape(position_matrix)
 	for column in range(vector_len):
 		v = position_matrix[:, column]
 		mean = v.sum() / float(dimension_len)
