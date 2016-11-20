@@ -1,9 +1,13 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+<<<<<<< HEAD
+=======
+from mpl_toolkits.mplot3d import Axes3D
+>>>>>>> d8d577efa7246b4ec04a227c785755096fa58813
 
 SAMPLING_RATE = 200 # HZ
-T = 1 # assume sampling period is 1 for now to avoid multiplying by small decimal
+T = 100 # assume sampling period is 1 for now to avoid multiplying by small decimal
 
 # IMPORTANT NOTE: THIS ALGORITHM WAS TESTED ON THE WIIMOTE USING A MODEL THAT 
 # PRE-ADJUSTS FOR BIAS AND SENSITIVITY IN THE SENSOR. THEREFORE, NO CALIBRATION 
@@ -79,7 +83,18 @@ def dead_reckoning():
 
 	print('Position Matrix:')
 	print(position_matrix)
-	np.savetxt(sys.argv[2], position_matrix) # write text to a file
+	np.savetxt(sys.argv[2], position_matrix, delimiter=",") # write text to a file
+
+	######### Plot 3D position data ############
+	fig = plt.figure()
+	ax = fig.add_subplot(111, projection='3d')
+	ax.scatter(position_matrix[::,0], position_matrix[::,1], position_matrix[::,2], depthshade=True)
+	plt.show()
+
+	######### Plot 2D projected position data ############
+	pos2D = project(position_matrix)
+	plt.plot(pos2D[:,0], pos2D[:,1])
+	plt.show()
 
 	# assume y position is invariant and return [x,z]
 	plt.plot(position_matrix[:, [0, 2]])
@@ -88,6 +103,7 @@ def dead_reckoning():
 
 
 # performs SVD and PCA on matrix to project onto 2D writing surface
+<<<<<<< HEAD
 # test case: position_matrix = np.array([[1,2,0],[3,4,0],[5,9,0],[2,5,0]])
 # def project(position_matrix):
 # 	# subtract the mean from each dimension
@@ -104,6 +120,23 @@ def dead_reckoning():
 # 	result = result.T
 
 # 	return result # 2D projection
+=======
+def project(position_matrix):
+	# subtract the mean from each dimension
+	dimension_len, vector_len = np.shape(position_matrix)
+	for column in range(vector_len):
+		v = position_matrix[:, column]
+		mean = v.sum() / float(dimension_len)
+		print(mean)
+		v = v - mean
+		position_matrix[:, column] = v
+
+	U,S,V = np.linalg.svd(position_matrix)
+	result = V[:, :2].T.dot(position_matrix.T)
+	result = result.T
+
+	return result # 2D projection
+>>>>>>> d8d577efa7246b4ec04a227c785755096fa58813
 
 dead_reckoning()
 
