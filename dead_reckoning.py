@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+import matplotlib.pyplot as plt
 
 SAMPLING_RATE = 200 # HZ
 T = 1 # assume sampling period is 1 for now to avoid multiplying by small decimal
@@ -10,6 +11,10 @@ T = 1 # assume sampling period is 1 for now to avoid multiplying by small decima
 # CALIBRATE. DATA IS ALSO ALREADY LOW-PASS FILTERED. THIS WILL ALSO NEED TO BE 
 # IMPLEMENTED IN THE MORE GENERAL ALGORITHM.
 def dead_reckoning():
+	if len(sys.argv) < 2:
+		print('Error: Usage. Please provide data source as argument.')
+		return 
+
 	f_read = open(sys.argv[1], 'r')
 	#f_write = open(sys.argv[2], 'w')
 
@@ -30,12 +35,25 @@ def dead_reckoning():
 	print('Acceleration Matrix:')
 	print(accel_matrix)
 
-	######### Condition accelerometer data by removing gravity vector from all mesaurements ############
+	# ######### Condition accelerometer data by removing gravity vector from all mesaurements ############
+	# for i in range(num_samples):
+	# 	x, y, z, roll, pitch = accel_matrix[i]
+	# 	roll = roll * np.pi / 180.0
+	# 	pitch = pitch * np.pi / 180.0
+	# 	accel_matrix[i] = np.array([x, y - np.sin(roll), z - np.cos(roll), roll, pitch]) # checkme
+
+	# compute nominal gravity vector by averaging first 10 samples 
+	# (assumes user holds device still for a second or so in the beginning)
+	g_nominal = [0,0,0]
+	for i in range(10):
+		g_nominal += accel_matrix[i, :3]
+	g_nominal /= 10.0
+
+	# subtract nominal gravity from all samples
 	for i in range(num_samples):
 		x, y, z, roll, pitch = accel_matrix[i]
-		roll = roll * np.pi / 180.0
-		pitch = pitch * np.pi / 180.0
-		accel_matrix[i] = np.array([x, y - np.sin(roll), z - np.cos(roll), roll, pitch]) # checkme
+		g_x, g_y, g_z = g_nominal
+		accel_matrix[i] = np.array([x - g_x, y - g_y, z - g_z] + [roll, pitch])
 
 
 	######### Populate the velocity data ############
@@ -63,25 +81,29 @@ def dead_reckoning():
 	print(position_matrix)
 	np.savetxt(sys.argv[2], position_matrix) # write text to a file
 
-	return position_matrix
+	# assume y position is invariant and return [x,z]
+	plt.plot(position_matrix[:, [0, 2]])
+	plt.show()
+	return position_matrix[:, [0,2]]
 
 
 # performs SVD and PCA on matrix to project onto 2D writing surface
-def project(position_matrix):
-	# subtract the mean from each dimension
-	dimension_len, vector_len = np.size(position_matrix)
-	for column in range(vector_len):
-		v = position_matrix[:, column]
-		mean = v.sum() / float(dimension_len)
-		print(mean)
-		v = v - mean
-		position_matrix[:, column] = v
+# test case: position_matrix = np.array([[1,2,0],[3,4,0],[5,9,0],[2,5,0]])
+# def project(position_matrix):
+# 	# subtract the mean from each dimension
+# 	dimension_len, vector_len = np.size(position_matrix)
+# 	for column in range(vector_len):
+# 		v = position_matrix[:, column]
+# 		mean = v.sum() / float(dimension_len)
+# 		print(mean)
+# 		v = v - mean
+# 		position_matrix[:, column] = v
 
-	U,S,V = np.linalg.svd(position_matrix)
-	result = V[:, :2].T.dot(position_matrix.T)
-	result = result.T
+# 	U,S,V = np.linalg.svd(position_matrix)
+# 	result = V[:, :2].T.dot(position_matrix.T)
+# 	result = result.T
 
-	return result # 2D projection
+# 	return result # 2D projection
 
 dead_reckoning()
 
