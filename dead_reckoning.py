@@ -1,10 +1,7 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-<<<<<<< HEAD
-=======
 from mpl_toolkits.mplot3d import Axes3D
->>>>>>> d8d577efa7246b4ec04a227c785755096fa58813
 
 SAMPLING_RATE = 200 # HZ
 T = 100 # assume sampling period is 1 for now to avoid multiplying by small decimal
@@ -103,7 +100,6 @@ def dead_reckoning():
 
 
 # performs SVD and PCA on matrix to project onto 2D writing surface
-<<<<<<< HEAD
 # test case: position_matrix = np.array([[1,2,0],[3,4,0],[5,9,0],[2,5,0]])
 # def project(position_matrix):
 # 	# subtract the mean from each dimension
@@ -120,7 +116,6 @@ def dead_reckoning():
 # 	result = result.T
 
 # 	return result # 2D projection
-=======
 def project(position_matrix):
 	# subtract the mean from each dimension
 	dimension_len, vector_len = np.shape(position_matrix)
@@ -136,7 +131,6 @@ def project(position_matrix):
 	result = result.T
 
 	return result # 2D projection
->>>>>>> d8d577efa7246b4ec04a227c785755096fa58813
 
 dead_reckoning()
 
