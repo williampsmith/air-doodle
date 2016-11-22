@@ -1,0 +1,1 @@
+Copy all folders to the Arduino libraries folder.
