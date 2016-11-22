@@ -19,7 +19,7 @@
 #define D   A3
 RGBmatrixPanel matrix(A, B, C, D, CLK, LAT, OE, false);
 
-#define numBytes 66
+#define numBytes 64
 #define dimX 24
 #define dimY 21
 

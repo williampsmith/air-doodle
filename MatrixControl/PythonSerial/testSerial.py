@@ -38,7 +38,7 @@ time.sleep(1)
 #     bitmap.append(x)
 # arduino.write(bitmap)
 
-numBytes = 66
+numBytes = 64
 bitmap = []
 x = 0
 for _ in range(numBytes):
