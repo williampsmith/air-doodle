@@ -1,0 +1,10 @@
+// Test i2c connection on Raspberry Pi
+ls -l /dev/i2c*
+i2cdetect -y 0...n
+
+// Setting up bluetooth
+sudo bluetoothctl
+ -> power on
+ -> agent on
+ -> scan on
+ -> connect XX:XX:XX:XX:XX:XX
