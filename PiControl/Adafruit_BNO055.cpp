@@ -34,13 +34,8 @@ Adafruit_BNO055::Adafruit_BNO055(int32_t sensorID, uint8_t address) {
 
 // Sets up the hardware
 bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode) {
-  /* Enable I2C */
-  Wire.begin();
-
-  // BNO055 clock stretches for 500us or more!
-  #ifdef ESP8266
-    Wire.setClockStretchLimit(1000); // Allow for 1000us of clock stretching
-  #endif
+  // Enable I2C
+  i2c = wiringPiI2CSetup(_address);
 
   // Make sure we have the right device
   uint8_t id = read8(BNO055_CHIP_ID_ADDR);
@@ -462,10 +457,7 @@ bool Adafruit_BNO055::isFullyCalibrated(void) {
 
 // Writes an 8 bit value over I2C
 bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, byte value) {
-  Wire.beginTransmission(_address);
-  Wire.write((uint8_t)reg);
-  Wire.write((uint8_t)value);
-  Wire.endTransmission();
+  wiringPiI2CWriteReg8(i2c, reg, value);
   return true;
 }
 
@@ -473,24 +465,15 @@ bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, byte value) {
 byte Adafruit_BNO055::read8(adafruit_bno055_reg_t reg ) {
   byte value = 0;
 
-  Wire.beginTransmission(_address);
-  Wire.write((uint8_t)reg);
-  Wire.endTransmission();
-  Wire.requestFrom(_address, (byte)1);
-  value = Wire.read();
+  value = wiringPiI2CReadReg8(i2c, reg);
 
   return value;
 }
 
 // Reads the specified number of bytes over I2C
 bool Adafruit_BNO055::readLen(adafruit_bno055_reg_t reg, byte * buffer, uint8_t len) {
-  Wire.beginTransmission(_address);
-  Wire.write((uint8_t)reg);
-  Wire.endTransmission();
-  Wire.requestFrom(_address, (byte)len);
-
   for (uint8_t i = 0; i < len; i++) {
-    buffer[i] = Wire.read();
+    buffer[i] = wiringPiI2CReadReg8(i2c, reg);
   }
 
   return true;

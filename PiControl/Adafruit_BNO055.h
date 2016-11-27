@@ -21,17 +21,26 @@
  * Updated by Mitchell Oleson for Air Doodle and other projects on the Raspberry Pi.
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <limits.h>
+
+#include <errno.h>
+#include <unistd.h>
+#include <iostream>
+
+#include <wiringPi.h>
+#include <wiringPiI2C.h>
 
 #include <math.h>
-#include <limits.h>
-#include <wiringPi.h>
 #include <Pi_Sensor.h>
 #include <utility/imumaths.h>
 
-#define BNO055_ADDRESS (0x28)
-#define BNO055_ID      (0xA0)
+#define BNO055_ADDRESS  0x28
+#define BNO055_ID       0xA0
 
-#define NUM_BNO055_OFFSET_REGISTERS (22)
+#define NUM_BNO055_OFFSET_REGISTERS 22
 
 typedef struct {
     uint16_t accel_offset_x;
@@ -293,7 +302,8 @@ class Adafruit_BNO055 : public Pi_Sensor {
     bool  readLen ( adafruit_bno055_reg_t, byte* buffer, uint8_t len );
     bool  write8  ( adafruit_bno055_reg_t, byte value );
 
-    uint8_t _address;
-    int32_t _sensorID;
+    int _address;
+    int _sensorID;
+    int i2c;
     adafruit_bno055_opmode_t _mode;
 };
