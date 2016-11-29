@@ -18,6 +18,31 @@ def writeToSerial(destination, bitmap, shouldClearDisplay = 1, timeout = 0.04):
     destination.write(data)
     time.sleep(timeout)
 
+def scrollBitmapMatrix(bitmapMatrix, LeftOrRight = 0):
+    # Scroll the matrix 1 pixel left or right
+    # LeftOrRight: 0 means scroll left, 1 means scroll right
+    newBitmapMatrix = []
+    for col in range(32):
+        for row in range(32):
+            newBitmapMatrix[row][col] = bitmapMatrix[(row - 1) % 32][col]
+    return newBitmapMatrix
+
+def matrixToBitmap(bitmapMatrix):
+    bitmap = []
+
+    for i in range(32):
+        for j in range(4):
+            bit_array = bitmapMatrix[i][8 * j: (8 * j) + 8] # get 8 bit chunk
+            bit_string = ''
+
+            for b in bit_array:
+                bit_string += str(b)
+
+            display_int = int(bit_string, 2)
+            bitmap.append(display_int)
+
+    return bitmap
+
 arduino = serial.Serial(port='/dev/cu.usbmodem1411', baudrate=115200, timeout=0.1)
 
 time.sleep(1) # give the connection a second to settle

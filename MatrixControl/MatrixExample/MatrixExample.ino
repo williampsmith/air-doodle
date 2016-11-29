@@ -23,6 +23,7 @@ void setup() {
 
   matrix.begin();
 //  matrix.print("A");
+//  matrix.setRotation(3);
   // draw a pixel in solid white
   // matrix.drawPixel(16, 16, matrix.Color333(7, 7, 7)); 
 //  delay(500);
