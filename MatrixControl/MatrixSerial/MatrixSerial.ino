@@ -19,37 +19,46 @@
 #define D   A3
 RGBmatrixPanel matrix(A, B, C, D, CLK, LAT, OE, false);
 
-#define numBytes 64
-#define dimX 24
-#define dimY 21
+#define numBytes 128
+#define dimX 32
+#define dimY 32
 
 void setup() {
   matrix.begin();
-  Serial.begin(9600);
+  Serial.begin(115200);
+  matrix.fillScreen(matrix.Color333(0, 0, 0));
 }
 
 void loop() {
   if(Serial.available()) {
-    matrix.fillScreen(matrix.Color333(0, 0, 0));
+   // matrix.fillScreen(matrix.Color333(0, 0, 0));
     byte x = 0;
     byte y = 0;
     byte bitmap[numBytes]; // = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    byte shouldClearDisplay;
     byte i = 0;
 
-    while (Serial.available() > 0) {
-        bitmap[i] = Serial.read();
-        i++;
-        delay(1);
+    while (i < 128) {
+      while (!Serial.available()) {} // spin loop: wait for next 64 bytes
+      bitmap[i] = Serial.read();
+      i++;
+    }
+    while (!Serial.available()) {}
+    shouldClearDisplay = Serial.read(); // read last bit
+
+    if (shouldClearDisplay) {
+      matrix.fillScreen(matrix.Color333(0, 0, 0));
     }
     
-    matrix.drawBitmap(4, 5, bitmap, dimX, dimY, matrix.Color333(0,1,0));
+    // start at (0,0) and draw bitmap to (32,32) with the given color
+    matrix.drawBitmap(0, 0, bitmap, dimX, dimY, matrix.Color333(0,1,0));
     
 //    byte buff1[numData+4];
 //    for (int j = 0; j < numData; j++) {
 //      buff1[j] = buff[i];
 //        Serial.write(byte(buff[j]));
 //    }
-    
+//    
 //    for (int j = 0; j < numBytes; j++) {
 //      byte z = 128;
 //      for (byte k = 0; k < 8; k++) {
@@ -64,5 +73,6 @@ void loop() {
 //        y += 1;
 //      }
 //    }
+
   }
 }
