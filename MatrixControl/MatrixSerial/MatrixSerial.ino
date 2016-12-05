@@ -39,7 +39,7 @@ void loop() {
     byte i = 0;
 
     while (i < 128) {
-      while (!Serial.available()) {} // spin loop: wait for next 64 bytes
+      while (!Serial.available()) {} // spin loop: wait until bytes are ready in buffer
       bitmap[i] = Serial.read();
       i++;
     }
