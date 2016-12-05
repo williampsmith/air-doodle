@@ -34,8 +34,8 @@ def dead_reckoning():
 
     input_matrix = np.array(input_matrix)
     print('Number of samples: ', num_samples)
-    print('Input Matrix:')
-    print(input_matrix)
+    #print('Input Matrix:')
+    #print(input_matrix)
 
     # ######### Condition accelerometer data by removing gravity vector from all mesaurements ############
     # for i in range(num_samples):
@@ -55,31 +55,31 @@ def dead_reckoning():
     for i in range(num_samples):
         accel_matrix.append(input_matrix[i, :3] - g_nominal)
     accel_matrix = np.array(accel_matrix)
-    print('Acceleration Matrix:')
-    print(accel_matrix)
+    #print('Acceleration Matrix:')
+    #print(accel_matrix)
 
     ######### Populate the velocity data ############
     velocity_matrix = np.empty((num_samples, 3))
-    print('velocity matrix dimensions: ', velocity_matrix.shape)
+    #print('velocity matrix dimensions: ', velocity_matrix.shape)
     velocity_matrix[0] = np.array([0,0,0]) # initial velocity. Assume starting at rest
 
     for i in range(1, num_samples):
         velocity_matrix[i] = np.array(velocity_matrix[i - 1] + accel_matrix[i - 1] * T )
 
-    print('Velocity Matrix:')
-    print(velocity_matrix)
+    #print('Velocity Matrix:')
+    #print(velocity_matrix)
 
     ######### Populate the position data ############
     position_matrix = np.empty((num_samples, 3))
-    print('position matrix dimensions: ', position_matrix.shape)
+    #print('position matrix dimensions: ', position_matrix.shape)
     position_matrix[0] = np.array([0,0,0]) # initial position. Assume starting at origin
 
     for i in range(1, num_samples):
-        #velocity_matrix[i - 1] * T + 0.5 * accel_matrix[i - 1] * T**2
+        #position_matrix[i] = np.array(position_matrix[i - 1] + velocity_matrix[i - 1] * T + 0.5 * accel_matrix[i - 1] * T**2)
         position_matrix[i] = np.array(position_matrix[i - 1] + 0.5 * accel_matrix[i - 1] * T**2)
 
-    print('Position Matrix:')
-    print(position_matrix)
+    #print('Position Matrix:')
+    #print(position_matrix)
     np.savetxt(sys.argv[2], position_matrix, delimiter=",") # write text to a file
 
     ######### Plot 3D position data ############
@@ -100,6 +100,10 @@ def dead_reckoning():
     # assume y position is invariant and return [x,z]
     plt.plot(position_matrix[:, 0], position_matrix[:, 2])
     plt.show()
+
+    print(max(input_matrix[::,0]))
+    print(max(input_matrix[::,1]))
+    print(max(input_matrix[::,2]))
     return position_matrix[:, [0, 2]]
 
 #   return result # 2D projection
@@ -109,7 +113,7 @@ def project(position_matrix):
     for column in range(vector_len):
         v = position_matrix[:, column]
         mean = v.sum() / float(dimension_len)
-        print(mean)
+        #print(mean)
         v = v - mean
         position_matrix[:, column] = v
 
