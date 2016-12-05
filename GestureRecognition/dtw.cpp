@@ -20,13 +20,13 @@ int main (int argc, const char * argv[])
    //Load some training data to train the classifier - the DTW uses LabelledTimeSeriesClassificationData
    LabelledTimeSeriesClassificationData trainingData;
 
-   if( !trainingData.loadDatasetFromFile("trainingData/trainingData.txt") ){
+   if( !trainingData.loadDatasetFromFile("TrainingData.txt") ){
        cout << "Failed to load training data!\n";
        return EXIT_FAILURE;
    }
 
-   //Use 20% of the training dataset to create a test dataset
-   LabelledTimeSeriesClassificationData testData = trainingData.partition( 80 );
+   //Use 25% of the training dataset to create a test dataset
+   LabelledTimeSeriesClassificationData testData = trainingData.partition( 75 );
 
    //Trim the training data for any sections of non-movement at the start or end of the recordings
    dtw.enableTrimTrainingData(true,0.1,90);
