@@ -1,3 +1,3 @@
-g++ -std=c++11 -c dtw.cpp -I/usr/local/include
-g++ dtw.o -o dtw -I/usr/local/include -L/usr/local/lib -lgrt
-./dtw
+g++ -std=c++11 -c dtwPipeline.cpp -I/usr/local/include
+g++ dtwPipeline.o -o dtwPipeline -I/usr/local/include -L/usr/local/lib -lgrt
+./dtwPipeline

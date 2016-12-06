@@ -1,4 +1,7 @@
 /*
+  Modified from Gesture Recognition Toolkit DTW Example by Nick Gillian
+  - http://www.nickgillian.com/wiki/pmwiki.php/GRT/DTW
+
   This example shows you how to:
 - Create an initialize the DTW algorithm
 - Load some LabelledTimeSeriesClassificationData from a file and partition the training data into a training dataset and a test dataset
