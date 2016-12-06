@@ -9,7 +9,8 @@
 */
 
 //You might need to set the specific path of the GRT header relative to your project
-#include "GRT.h"
+#include <GRT/GRT.h>
+using namespace std;
 using namespace GRT;
 
 int main (int argc, const char * argv[])
@@ -26,7 +27,7 @@ int main (int argc, const char * argv[])
    }
 
    //Use 25% of the training dataset to create a test dataset
-   LabelledTimeSeriesClassificationData testData = trainingData.partition( 75 );
+   LabelledTimeSeriesClassificationData testData = trainingData.split( 75 );
 
    //Trim the training data for any sections of non-movement at the start or end of the recordings
    dtw.enableTrimTrainingData(true,0.1,90);
@@ -38,13 +39,13 @@ int main (int argc, const char * argv[])
    }
 
    //Save the DTW model to a file
-   if( !dtw.saveModelToFile("DTWModel.txt") ){
+   if( !dtw.save("DTWModel.txt") ){
        cout << "Failed to save the classifier model!\n";
        return EXIT_FAILURE;
    }
 
    //Load the DTW model from a file
-   if( !dtw.loadModelFromFile("DTWModel.txt") ){
+   if( !dtw.load("DTWModel.txt") ){
        cout << "Failed to load the classifier model!\n";
        return EXIT_FAILURE;
    }
@@ -77,3 +78,4 @@ int main (int argc, const char * argv[])
    cout << "Test Accuracy: " << accuracy/double(testData.getNumSamples())*100.0 << "%" << endl;
 
    return EXIT_SUCCESS;
+ }
