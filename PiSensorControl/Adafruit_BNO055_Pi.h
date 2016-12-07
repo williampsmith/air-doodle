@@ -263,7 +263,7 @@ class Adafruit_BNO055 : public Pi_Sensor {
       VECTOR_GRAVITY       = BNO055_GRAVITY_DATA_X_LSB_ADDR
     } adafruit_vector_type_t;
 
-    BNO055 ( int32_t sensorID = -1, uint8_t address = BNO055_ADDRESS );
+    Adafruit_BNO055 ( int32_t sensorID = -1, uint8_t address = BNO055_ADDRESS );
     bool  begin               ( adafruit_bno055_opmode_t mode = OPERATION_MODE_NDOF );
     void  setMode             ( adafruit_bno055_opmode_t mode );
     void  getRevInfo          ( adafruit_bno055_rev_info_t* );
@@ -275,7 +275,7 @@ class Adafruit_BNO055 : public Pi_Sensor {
     void  displaySystemStatus ( void );
     void  getCalibration      ( uint8_t* system, uint8_t* gyro, uint8_t* accel, uint8_t* mag);
 
-    std::vector<float>  getVector ( adafruit_vector_type_t vector_type );
+    std::vector<double>  getVector ( adafruit_vector_type_t vector_type );
     int8_t          getTemp   ( void );
 
     // Adafruit_Sensor implementation

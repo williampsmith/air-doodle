@@ -43,8 +43,10 @@ void loop(void)
 
   if (buttonState == HIGH) {
     /* Get a new sensor event */ 
-    sensors_event_t event; 
+    sensors_event_t event;
+    imu::Vector<3> accel;
     bno.getEvent(&event);
+    accel = bno.getVector(bno.VECTOR_LINEARACCEL);
     
     // display x,y,z orientation
     Serial.print(event.orientation.x, 4);
@@ -55,11 +57,11 @@ void loop(void)
     Serial.print(",");
     
     // display x,y,z acceleration
-    Serial.print((bno.getVector(bno.VECTOR_LINEARACCEL))[0]);
+    Serial.print(accel[0]);
     Serial.print(",");
-    Serial.print((bno.getVector(bno.VECTOR_LINEARACCEL))[1]);
+    Serial.print(accel[1]);
     Serial.print(",");
-    Serial.print((bno.getVector(bno.VECTOR_LINEARACCEL))[2]);
+    Serial.print(accel[2]);
     Serial.println("");
       
     delay(50);

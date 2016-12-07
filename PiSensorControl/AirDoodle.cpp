@@ -1,5 +1,5 @@
 /*
- *
+ * Created by Mitchell Oleson for EECS149 AirDoodle Projectpthread_mutex_lock(&threads)
  */
 
 #include "AirDoodle.h"
@@ -21,31 +21,27 @@ void irq_handler() {
 
 // ---------- HELPER FUNCTIONS -----------
 
-// Wait for all threads to finish then close bluetooth socket
-void killBlue() {
-}
-
 // Transmit gesture classification via the bluetooth connection
-void send(int num, unsigned char* gesture) {
+void send(uint num, uint gesture) {
 	// Acquire blue lock
 	pthread_mutex_lock(&blue);
 
 	// Send thread number for ordering
-	status = write(pi_sock, (char *) &num);
+	status = write(blue_sock, (char *) &num);
 	while (status < 0) {
-		std::cout << "Error sending threadNum to server\n";
+		std::cout << "Error sending " << threadNum << " to server\n";
 		delay(50);
 		std::cout << "Trying again...\n";
-		status = write(pi_sock, (char *) &num)
+		status = write(blue_sock, (char *) &num)
 	}
 
-	// Send byte of the char
-	status = write(pi_sock, gesture);
+	// Send gesture label
+	status = write(blue_sock, (char *) &gesture);
 	while (status < 0) {
-		std::cout << "Error sending gesture to server\n";
+		std::cout << "Error sending " << threadNum << " to server\n";
 		delay(50);
 		std::cout << "Trying again...\n";
-		status = write(pi_sock, num)
+		status = write(blue_sock, (char *) &num)
 	}
 
 	// Release blue lock
@@ -54,11 +50,21 @@ void send(int num, unsigned char* gesture) {
 
 // Drop in function for new thread
 void analyze(void* args) {
-	unsigned char* gesture;
 	struct thread_arg_struct *inputs = args;
 
-	// Classify input acceletaion data matrix
-	gesture = classify(inputs.matrix); // Replace with final function calls based on input data
+	//Setup a custom recognition pipeline
+  	GRT::GestureRecognitionPipeline pipeline;
+  	if (!pipeline.load("DTW_Pipeline_Model.txt")) {
+  		std::cout << "Failed to load the classifier model\n";
+  		return
+  	}
+
+	// Predict gesture using the classifier
+	if (!pipeline.predict(inputs.matrix)) {
+		std::cout << "Failed to perform prediction for sample " << inputs.threadNum << "\n";
+		return
+	}
+	uint gesture = pipeline.getPredictedClassLabel();
 
 	// Send threadNum and recognized gesture to bluetooth function
 	send(inputs.threadNum, gesture);
@@ -72,17 +78,23 @@ void analyze(void* args) {
 // Logging function
 void logInput() {
 	GRT::MatrixFloat input_matrix;
-	GRT::VectroFloat input_vector(6);
-	std::vector<float> accel;
-	std::vector<float> gyro;
-	float move = std::numeric_limits<float>::max();
+	GRT::VectorFloat input_vector(6);
+	std::vector<double> accel;
+	std::vector<double> gyro;
+	double move = std::numeric_limits<double>::max();
 
 	// Read new data until movemnet stops
 	while (move > 1.1) {
-		accel = bno055.getVector(VECTOR_ACCELEROMETER);
-		gyro = bno055.getVector(VECTOR_GYROSCOPE);
-		input_matrix.push_back(input_vector);
-		move = norm(next);
+		accel = bno055.getVector(bno055.VECTOR_ACCELEROMETER);
+		gyro = bno055.getVector(bno055.VECTOR_EULER);
+		input_vector[0] = (float) gyro[0];
+		input_vector[1] = (float) gyro[1];
+		input_vector[2] = (float) gyro[2];
+		input_vector[3] = (float) accel[0];
+		input_vector[4] = (float) accel[1];
+		input_vector[5] = (float) accel[2];
+		input_matrix.push_back(grt_vector);
+		move = std::sqrt(accel[0]*accel[0] + accel[1]*accel[1] + accel[2]*accel[2]);
 	}
 
 	// Create structs for new thread
@@ -108,16 +120,16 @@ int main(int argc, char **argv) {
 	// Setup wiringPi
 	if (wiringPiSetup() < 0) {
       std::cout << "Unable to setup wiringPi: " << strerror(errno) << "\n";
-      exit(EXIT_FAILURE);
+      return EXIT_FAILURE;
   	}
 
   	// Setup buttons
-  	pinMode(BUTTON0_PIN, INPUT);
   	pinMode(BUTTON1_PIN, INPUT);
 
   	// Setup sensor
-  	bno055 = new Adafruit_BNO055_Pi(BNO055_ID, BNO055_ADDRESS);
-  	bno055.begin(OPERATION_MODE_ACCGYRO);
+  	bno055 = new Adafruit_BNO055_Pi(55);
+  	bno055.begin();
+  	bno055.setExtCrystalUse(true);
 
     // Setup and connect to display unit
     blue_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
@@ -127,7 +139,7 @@ int main(int argc, char **argv) {
 	status = connect(s, (struct sockaddr *)&blue_conn, sizeof(blue_conn));
 	if (status < 0) {
 		std::cout << "Error connecting to server\n";
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 
 	// Setup threaded environment & mutexes
@@ -136,26 +148,31 @@ int main(int argc, char **argv) {
 	pthread_mutex_init(&threads);
 	if (pthread_attr_init(&attr); != 0) {
 		std::cout << "Error in pthread_attr_init\n";
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 	if (pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED) != 0) {
 		std::cout << "Error in pthread_attr_setdetachstate\n";
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 	
 	// Setup interrupts
 	if (wiringPiISR(BUTTON0_PIN, INT_EDGE_FALLING, &irq_handler) < 0 ) {
     	std::cout << "Unable to setup ISR: " << strerror(errno) << "\n";
-      	exit(EXIT_FAILURE);
+      	return EXIT_FAILURE;
   	}
 
-  	while (true) {
-  		;
+  	for (;;) {
+  		if (digitalRead(BUTTON1_PIN) == 1) {
+  			break;
+  		} else {
+  			delay(50);
+  		}
   	}
 
-  	// Disable interrupts
+  	// Block data collection (or stall till last sample is done being collected)
+  	pthread_mutex_lock(&newData);
 
-  	// Wait for threads to finish
+  	// Wait for all threads to finish and exit
   	while (aliveThreads > 0) {
 		delay(50);
 	}
@@ -164,5 +181,5 @@ int main(int argc, char **argv) {
 	close(blue_sock);
 
 	// Exit
-	quick_exit(EXIT_SUCCESS);
+	return EXIT_SUCCESS;
 }

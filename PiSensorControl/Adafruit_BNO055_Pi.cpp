@@ -39,10 +39,10 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode) {
 
   // Make sure we have the right device
   uint8_t id = read8(BNO055_CHIP_ID_ADDR);
-  if(id != BNO055_ID) {
+  if (id != BNO055_ID) {
     delay(1000); // hold on for boot
     id = read8(BNO055_CHIP_ID_ADDR);
-    if(id != BNO055_ID) {
+    if (id != BNO055_ID) {
       return false;  // still not? ok bail
     }
   }
@@ -219,8 +219,8 @@ int8_t Adafruit_BNO055::getTemp(void) {
 }
 
 // Gets a vector reading from the specified source
-std::vector<float> v; Adafruit_BNO055::getVector(adafruit_vector_type_t vector_type) {
-  std::vector<float> xyz(3);
+std::vector<double> Adafruit_BNO055::getVector(adafruit_vector_type_t vector_type) {
+  std::vector<double> xyz(3);
   uint8_t buffer[6];
   memset (buffer, 0, 6);
 
@@ -239,29 +239,29 @@ std::vector<float> v; Adafruit_BNO055::getVector(adafruit_vector_type_t vector_t
   switch(vector_type) {
     case VECTOR_MAGNETOMETER:
       // 1uT = 16 LSB
-      xyz[0] = ((float)x)/16.0;
-      xyz[1] = ((float)y)/16.0;
-      xyz[2] = ((float)z)/16.0;
+      xyz[0] = ((double)x)/16.0;
+      xyz[1] = ((double)y)/16.0;
+      xyz[2] = ((double)z)/16.0;
       break;
     case VECTOR_GYROSCOPE:
       // 1rps = 900 LSB
-      xyz[0] = ((float)x)/900.0;
-      xyz[1] = ((float)y)/900.0;
-      xyz[2] = ((float)z)/900.0;
+      xyz[0] = ((double)x)/900.0;
+      xyz[1] = ((double)y)/900.0;
+      xyz[2] = ((double)z)/900.0;
       break;
     case VECTOR_EULER:
       // 1 degree = 16 LSB
-      xyz[0] = ((float)x)/16.0;
-      xyz[1] = ((float)y)/16.0;
-      xyz[2] = ((float)z)/16.0;
+      xyz[0] = ((double)x)/16.0;
+      xyz[1] = ((double)y)/16.0;
+      xyz[2] = ((double)z)/16.0;
       break;
     case VECTOR_ACCELEROMETER:
     case VECTOR_LINEARACCEL:
     case VECTOR_GRAVITY:
       // 1m/s^2 = 100 LSB
-      xyz[0] = ((float)x)/100.0;
-      xyz[1] = ((float)y)/100.0;
-      xyz[2] = ((float)z)/100.0;
+      xyz[0] = ((double)x)/100.0;
+      xyz[1] = ((double)y)/100.0;
+      xyz[2] = ((double)z)/100.0;
       break;
   }
 
@@ -296,7 +296,7 @@ bool Adafruit_BNO055::getEvent(sensors_event_t *event) {
   event->timestamp = millis();
 
   // Get a Euler angle sample for orientation
-  imu::Vector<3> euler = getVector(Adafruit_BNO055::VECTOR_EULER);
+  std::vector<double> euler = getVector(Adafruit_BNO055::VECTOR_EULER);
   event->orientation.x = euler.x();
   event->orientation.y = euler.y();
   event->orientation.z = euler.z();

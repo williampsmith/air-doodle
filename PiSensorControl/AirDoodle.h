@@ -1,8 +1,13 @@
+/*
+ * Created by Mitchell Oleson for EECS149 AirDoodle Projectpthread_mutex_lock(&threads)
+ */
+
 // Generic Libs
 #include <iostream>
 #include <limits>
 #include <vector>
 #include <math>
+#include <algorithm>
 
 // Multithreading libs
 #include <pthread.h>
@@ -32,7 +37,7 @@
 #define SERVER_CHANNEL	1 // Channel for the bluetooth connection
 #define SERVER_BADDR_CHAR "58:A8:39:00:55:1A" // Bluetooth MAC address for the edison
 
-#define I2C_BAUD 38400 // Baudrate for i2c
+#define I2C_BAUD 115200 // Baudrate for i2c
 
 
 // ---------- FUNCTION DEFINITIONS -----------
@@ -46,7 +51,7 @@
 // Second Stage Thread Functions
 void irq_handler();	// Handles interrupts and function calls
 void analyze(void* args);	// Parse input acceleration matrix
-void send(int num, unsigned char* gesture);		// Send character and position to waiting edison
+void send(uint num, uint gesture);		// Send character and position to waiting edison
 void logInput();	// Response for button interrupt to start logging data
 
 // Bluetooth global variables
