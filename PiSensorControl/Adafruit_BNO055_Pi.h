@@ -21,21 +21,14 @@
  * Updated by Mitchell Oleson for Air Doodle and other projects on the Raspberry Pi.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
-
-#include <errno.h>
-#include <unistd.h>
 #include <iostream>
+#include <limits>
+#include <math>
 
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 
-#include <math.h>
-#include <Pi_Sensor.h>
-#include <utility/imumaths.h>
+#include <Sensor_Pi.h>
 
 #define BNO055_ADDRESS  0x28
 #define BNO055_ID       0xA0
@@ -282,8 +275,7 @@ class Adafruit_BNO055 : public Pi_Sensor {
     void  displaySystemStatus ( void );
     void  getCalibration      ( uint8_t* system, uint8_t* gyro, uint8_t* accel, uint8_t* mag);
 
-    imu::Vector<3>  getVector ( adafruit_vector_type_t vector_type );
-    imu::Quaternion getQuat   ( void );
+    std::vector<float>  getVector ( adafruit_vector_type_t vector_type );
     int8_t          getTemp   ( void );
 
     // Adafruit_Sensor implementation

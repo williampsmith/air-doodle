@@ -9,7 +9,7 @@
 
 // Handler for the button interrupt
 void irq_handler() {
-	// Attempt to acquire newData lock
+	// Attempt to acquire newData lock (if fails we are already collecting so ignore)
 	if (pthread_mutex_trylock(&newData) == 0) {
 		// Begin logging new data
 		logInput();
@@ -21,6 +21,10 @@ void irq_handler() {
 
 // ---------- HELPER FUNCTIONS -----------
 
+// Wait for all threads to finish then close bluetooth socket
+void killBlue() {
+}
+
 // Transmit gesture classification via the bluetooth connection
 void send(int num, unsigned char* gesture) {
 	// Acquire blue lock
@@ -29,18 +33,18 @@ void send(int num, unsigned char* gesture) {
 	// Send thread number for ordering
 	status = write(pi_sock, (char *) &num);
 	while (status < 0) {
-		printf("Error sending threadNum to server\n");
+		std::cout << "Error sending threadNum to server\n";
 		delay(50);
-		printf("Trying again...\n");
+		std::cout << "Trying again...\n";
 		status = write(pi_sock, (char *) &num)
 	}
 
 	// Send byte of the char
 	status = write(pi_sock, gesture);
 	while (status < 0) {
-		printf("Error sending gesture to server\n");
+		std::cout << "Error sending gesture to server\n";
 		delay(50);
-		printf("Trying again...\n");
+		std::cout << "Trying again...\n";
 		status = write(pi_sock, num)
 	}
 
@@ -58,18 +62,26 @@ void analyze(void* args) {
 
 	// Send threadNum and recognized gesture to bluetooth function
 	send(inputs.threadNum, gesture);
+
+	// Decrement alive threads
+	pthread_mutex_lock(&threads);
+	aliveThreads = aliveThreads - 1;
+	pthread_mutex_unlock(&threads);
 }
 
 // Logging function
 void logInput() {
-	float input_matrix[][];
-	float next[3];
-	int move = 10;
+	GRT::MatrixFloat input_matrix;
+	GRT::VectroFloat input_vector(6);
+	std::vector<float> accel;
+	std::vector<float> gyro;
+	float move = std::numeric_limits<float>::max();
 
 	// Read new data until movemnet stops
 	while (move > 1.1) {
-		next = i2c.read();
-		matrix.append(next);
+		accel = bno055.getVector(VECTOR_ACCELEROMETER);
+		gyro = bno055.getVector(VECTOR_GYROSCOPE);
+		input_matrix.push_back(input_vector);
 		move = norm(next);
 	}
 
@@ -81,7 +93,12 @@ void logInput() {
 
 	// Split off into new thread for analysis
 	pthread_create(&pth, &attr, analyze, (void *) &inputs);
-	nThread += 1;
+
+	// Increment thread counts
+	pthread_mutex_lock(&threads);
+	aliveThreads = aliveThreads + 1;
+	nThread = nThread + 1;
+	pthread_mutex_unlock(&threads);
 }
 
 
@@ -90,51 +107,62 @@ void logInput() {
 int main(int argc, char **argv) {
 	// Setup wiringPi
 	if (wiringPiSetup() < 0) {
-      printf("Unable to setup wiringPi: %s\n", strerror(errno));
-      exit(1);
+      std::cout << "Unable to setup wiringPi: " << strerror(errno) << "\n";
+      exit(EXIT_FAILURE);
   	}
 
-  	// Setup button
+  	// Setup buttons
   	pinMode(BUTTON0_PIN, INPUT);
+  	pinMode(BUTTON1_PIN, INPUT);
 
   	// Setup sensor
-  	pi_bno055 = new Adafruit_BNO055(BNO055_ID, BNO055_ADDRESS);
-  	pi_bno055.begin(OPERATION_MODE_ACCGYRO);
+  	bno055 = new Adafruit_BNO055_Pi(BNO055_ID, BNO055_ADDRESS);
+  	bno055.begin(OPERATION_MODE_ACCGYRO);
 
-    // Setup and connect to Edison
-    pi_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-	pi_conn.rc_family = AF_BLUETOOTH;
-	pi_conn.rc_channel = (uint8_t) EDISON_CHANNEL;
-	str2ba(EDISON_BADDR_CHAR, &pi_conn.rc_bdaddr);
-	status = connect(s, (struct sockaddr *)&pi_conn, sizeof(pi_conn));
+    // Setup and connect to display unit
+    blue_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+	blue_conn.rc_family = AF_BLUETOOTH;
+	blue_conn.rc_channel = (uint8_t) SERVER_CHANNEL;
+	str2ba(SERVER_BADDR_CHAR, &blue_conn.rc_bdaddr);
+	status = connect(s, (struct sockaddr *)&blue_conn, sizeof(blue_conn));
 	if (status < 0) {
-		printf("Error connecting to server\n");
-		exit(1);
+		std::cout << "Error connecting to server\n";
+		exit(EXIT_FAILURE);
 	}
 
 	// Setup threaded environment & mutexes
-	pthread_mutex_init(&blue)
-	pthread_mutex_init(&newData)
+	pthread_mutex_init(&blue);
+	pthread_mutex_init(&newData);
+	pthread_mutex_init(&threads);
 	if (pthread_attr_init(&attr); != 0) {
-		printf("Error in pthread_attr_init\n", );
+		std::cout << "Error in pthread_attr_init\n";
+		exit(EXIT_FAILURE);
 	}
 	if (pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED) != 0) {
-		printf("Error in pthread_attr_setdetachstate\n", );
+		std::cout << "Error in pthread_attr_setdetachstate\n";
+		exit(EXIT_FAILURE);
 	}
 	
 	// Setup interrupts
 	if (wiringPiISR(BUTTON0_PIN, INT_EDGE_FALLING, &irq_handler) < 0 ) {
-    	printf("Unable to setup ISR: %s\n", strerror (errno));
-      	exit(1);
+    	std::cout << "Unable to setup ISR: " << strerror(errno) << "\n";
+      	exit(EXIT_FAILURE);
   	}
 
   	while (true) {
   		;
   	}
 
+  	// Disable interrupts
+
+  	// Wait for threads to finish
+  	while (aliveThreads > 0) {
+		delay(50);
+	}
+
 	// Cleanup and close running processes
-	close(pi_sock);
+	close(blue_sock);
 
 	// Exit
-	return 0;
+	quick_exit(EXIT_SUCCESS);
 }

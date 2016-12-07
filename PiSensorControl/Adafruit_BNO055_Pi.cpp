@@ -21,7 +21,7 @@
  * Updated by Mitchell Oleson for Air Doodle and other projects on the Raspberry Pi.
  */
 
-#include "Adafruit_BNO055.h"
+#include "Adafruit_BNO055_Pi.h"
 
 // Creates a new sensor
 Adafruit_BNO055::Adafruit_BNO055(int32_t sensorID, uint8_t address) {
@@ -219,8 +219,8 @@ int8_t Adafruit_BNO055::getTemp(void) {
 }
 
 // Gets a vector reading from the specified source
-imu::Vector<3> Adafruit_BNO055::getVector(adafruit_vector_type_t vector_type) {
-  imu::Vector<3> xyz;
+std::vector<float> v; Adafruit_BNO055::getVector(adafruit_vector_type_t vector_type) {
+  std::vector<float> xyz(3);
   uint8_t buffer[6];
   memset (buffer, 0, 6);
 
@@ -239,56 +239,33 @@ imu::Vector<3> Adafruit_BNO055::getVector(adafruit_vector_type_t vector_type) {
   switch(vector_type) {
     case VECTOR_MAGNETOMETER:
       // 1uT = 16 LSB
-      xyz[0] = ((double)x)/16.0;
-      xyz[1] = ((double)y)/16.0;
-      xyz[2] = ((double)z)/16.0;
+      xyz[0] = ((float)x)/16.0;
+      xyz[1] = ((float)y)/16.0;
+      xyz[2] = ((float)z)/16.0;
       break;
     case VECTOR_GYROSCOPE:
       // 1rps = 900 LSB
-      xyz[0] = ((double)x)/900.0;
-      xyz[1] = ((double)y)/900.0;
-      xyz[2] = ((double)z)/900.0;
+      xyz[0] = ((float)x)/900.0;
+      xyz[1] = ((float)y)/900.0;
+      xyz[2] = ((float)z)/900.0;
       break;
     case VECTOR_EULER:
       // 1 degree = 16 LSB
-      xyz[0] = ((double)x)/16.0;
-      xyz[1] = ((double)y)/16.0;
-      xyz[2] = ((double)z)/16.0;
+      xyz[0] = ((float)x)/16.0;
+      xyz[1] = ((float)y)/16.0;
+      xyz[2] = ((float)z)/16.0;
       break;
     case VECTOR_ACCELEROMETER:
     case VECTOR_LINEARACCEL:
     case VECTOR_GRAVITY:
       // 1m/s^2 = 100 LSB
-      xyz[0] = ((double)x)/100.0;
-      xyz[1] = ((double)y)/100.0;
-      xyz[2] = ((double)z)/100.0;
+      xyz[0] = ((float)x)/100.0;
+      xyz[1] = ((float)y)/100.0;
+      xyz[2] = ((float)z)/100.0;
       break;
   }
 
   return xyz;
-}
-
-// Gets a quaternion reading from the specified source
-imu::Quaternion Adafruit_BNO055::getQuat(void) {
-  uint8_t buffer[8];
-  memset (buffer, 0, 8);
-
-  int16_t x, y, z, w;
-  x = y = z = w = 0;
-
-  // Read quat data (8 bytes)
-  readLen(BNO055_QUATERNION_DATA_W_LSB_ADDR, buffer, 8);
-  w = (((uint16_t)buffer[1]) << 8) | ((uint16_t)buffer[0]);
-  x = (((uint16_t)buffer[3]) << 8) | ((uint16_t)buffer[2]);
-  y = (((uint16_t)buffer[5]) << 8) | ((uint16_t)buffer[4]);
-  z = (((uint16_t)buffer[7]) << 8) | ((uint16_t)buffer[6]);
-
-  // Assign to Quaternion
-  // See http://ae-bst.resource.bosch.com/media/products/dokumente/bno055/BST_BNO055_DS000_12~1.pdf
-  // 3.6.5.5 Orientation (Quaternion)
-  const double scale = (1.0 / (1<<14));
-  imu::Quaternion quat(scale * w, scale * x, scale * y, scale * z);
-  return quat;
 }
 
 // Provides the sensor_t data for this sensor

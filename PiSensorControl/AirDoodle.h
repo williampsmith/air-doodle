@@ -1,8 +1,8 @@
 // Generic Libs
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <iostream>
+#include <limits>
+#include <vector>
+#include <math>
 
 // Multithreading libs
 #include <pthread.h>
@@ -15,23 +15,27 @@
 #include <bluetooth/hci_lib.h> // Bluez dev lib written for Raspberry Pi
 
 // Sensor lib
-#include <Adafruit_BNO055.h> // Adafruit BNO055 9-DOF sensor
+#include <Adafruit_BNO055_Pi.h> // Adafruit BNO055 9-DOF sensor
 
 // Interrupt lib
 #include <wiringPi.h>
 
+// Classification Lib
+#include <GRT/GRT.h>
+
 
 // ---------- GLOBAL DEFINITIONS -----------
 
-#define BUTTON0_PIN	0 // Button for Interrupts
+#define BUTTON0_PIN	0 // Button for interrupts
+#define BUTTON1_PIN 1 // Button to exit
 
-#define EDISON_CHANNEL	1 // Channel for the bluetooth connection
-#define EDISON_BADDR_CHAR "58:A8:39:00:55:1A" // Bluetooth MAC address for the edison
+#define SERVER_CHANNEL	1 // Channel for the bluetooth connection
+#define SERVER_BADDR_CHAR "58:A8:39:00:55:1A" // Bluetooth MAC address for the edison
 
 #define I2C_BAUD 38400 // Baudrate for i2c
 
 
-// ---------- MAIN FUNCTION -----------
+// ---------- FUNCTION DEFINITIONS -----------
 
 // Implicit First Stage Program States
 //  -> Intialize (setup)
@@ -46,18 +50,20 @@ void send(int num, unsigned char* gesture);		// Send character and position to w
 void logInput();	// Response for button interrupt to start logging data
 
 // Bluetooth global variables
-int pi_sock, status;
-struct sockaddr_rc pi_conn = {0};
+int blue_sock, status;
+struct sockaddr_rc blue_conn = {0};
 
 // BNO055 global variables
-Adafruit_BNO055 pi_bno055;
+Adafruit_BNO055_Pi bno055;
 
 // Threaded globals
 mutex_t blue;
 mutex_t newData;
+mutex_t threads;
 pthread_attr_t attr;
+int aliveThreads = 0;
 int nThread = 0;
 typedef struct {
 	int threadNum;
-	float matrix[][];
+	GRT::MatrixFloat matrix;
 } thread_arg_struct;
