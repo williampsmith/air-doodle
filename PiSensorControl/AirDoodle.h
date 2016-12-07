@@ -6,8 +6,8 @@
 #include <iostream>
 #include <limits>
 #include <vector>
-#include <math>
 #include <algorithm>
+#include <string.h>
 
 // Multithreading libs
 #include <pthread.h>
@@ -20,7 +20,7 @@
 #include <bluetooth/hci_lib.h> // Bluez dev lib written for Raspberry Pi
 
 // Sensor lib
-#include <Adafruit_BNO055_Pi.h> // Adafruit BNO055 9-DOF sensor
+#include "Adafruit_BNO055_Pi.h" // Adafruit BNO055 9-DOF sensor
 
 // Interrupt lib
 #include <wiringPi.h>
@@ -51,7 +51,7 @@
 // Second Stage Thread Functions
 void irq_handler();	// Handles interrupts and function calls
 void analyze(void* args);	// Parse input acceleration matrix
-void send(uint num, uint gesture);		// Send character and position to waiting edison
+void send(uint32_t num, uint32_t gesture);		// Send character and position to waiting edison
 void logInput();	// Response for button interrupt to start logging data
 
 // Bluetooth global variables
@@ -66,9 +66,9 @@ mutex_t blue;
 mutex_t newData;
 mutex_t threads;
 pthread_attr_t attr;
-int aliveThreads = 0;
-int nThread = 0;
+uint32_t aliveThreads = 0;
+uint32_t nThread = 0;
 typedef struct {
-	int threadNum;
+	uint32_t threadNum;
 	GRT::MatrixFloat matrix;
 } thread_arg_struct;

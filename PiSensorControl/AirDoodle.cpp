@@ -22,7 +22,7 @@ void irq_handler() {
 // ---------- HELPER FUNCTIONS -----------
 
 // Transmit gesture classification via the bluetooth connection
-void send(uint num, uint gesture) {
+void send(uint32_t num, uint32_t gesture) {
 	// Acquire blue lock
 	pthread_mutex_lock(&blue);
 
@@ -81,7 +81,7 @@ void logInput() {
 	GRT::VectorFloat input_vector(6);
 	std::vector<double> accel;
 	std::vector<double> gyro;
-	double move = std::numeric_limits<double>::max();
+	double move = 2;
 
 	// Read new data until movemnet stops
 	while (move > 1.1) {
@@ -127,11 +127,11 @@ int main(int argc, char **argv) {
   	pinMode(BUTTON1_PIN, INPUT);
 
   	// Setup sensor
-  	bno055 = new Adafruit_BNO055_Pi(55);
+  	bno055 = Adafruit_BNO055_Pi(55);
   	bno055.begin();
   	bno055.setExtCrystalUse(true);
 
-    // Setup and connect to display unit
+    // Setup and connect via bluetooth to display unit
     blue_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 	blue_conn.rc_family = AF_BLUETOOTH;
 	blue_conn.rc_channel = (uint8_t) SERVER_CHANNEL;
@@ -146,7 +146,7 @@ int main(int argc, char **argv) {
 	pthread_mutex_init(&blue);
 	pthread_mutex_init(&newData);
 	pthread_mutex_init(&threads);
-	if (pthread_attr_init(&attr); != 0) {
+	if (pthread_attr_init(&attr) != 0) {
 		std::cout << "Error in pthread_attr_init\n";
 		return EXIT_FAILURE;
 	}

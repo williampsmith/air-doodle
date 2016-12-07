@@ -98,7 +98,7 @@ void Adafruit_BNO055::setMode(adafruit_bno055_opmode_t mode) {
 }
 
 // Use the external 32.768KHz crystal
-void Adafruit_BNO055::setExtCrystalUse(boolean usextal) {
+void Adafruit_BNO055::setExtCrystalUse(bool usextal) {
   adafruit_bno055_opmode_t modeback = _mode;
 
   // Switch to config mode (just in case since this is the default)

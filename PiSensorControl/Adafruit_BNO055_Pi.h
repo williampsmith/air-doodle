@@ -23,17 +23,18 @@
 
 #include <iostream>
 #include <limits>
-#include <math>
 
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 
-#include <Sensor_Pi.h>
+#include "Adafruit_Sensor_Pi.h"
 
 #define BNO055_ADDRESS  0x28
 #define BNO055_ID       0xA0
 
 #define NUM_BNO055_OFFSET_REGISTERS 22
+
+typedef uint8_t  BYTE;
 
 typedef struct {
     uint16_t accel_offset_x;
@@ -268,7 +269,7 @@ class Adafruit_BNO055 : public Pi_Sensor {
     void  setMode             ( adafruit_bno055_opmode_t mode );
     void  getRevInfo          ( adafruit_bno055_rev_info_t* );
     void  displayRevInfo      ( void );
-    void  setExtCrystalUse    ( boolean usextal );
+    void  setExtCrystalUse    ( bool usextal );
     void  getSystemStatus     ( uint8_t *system_status,
                                 uint8_t *self_test_result,
                                 uint8_t *system_error);
