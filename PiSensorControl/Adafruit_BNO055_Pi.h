@@ -34,7 +34,7 @@
 
 #define NUM_BNO055_OFFSET_REGISTERS 22
 
-typedef uint8_t  BYTE;
+typedef uint8_t	byte;
 
 typedef struct {
     uint16_t accel_offset_x;
@@ -51,7 +51,7 @@ typedef struct {
     uint16_t mag_radius;
 } adafruit_bno055_offsets_t;
 
-class Adafruit_BNO055 : public Pi_Sensor {
+class Adafruit_BNO055 : public Adafruit_Sensor {
   public:
     typedef enum {
       // Page id register definition
