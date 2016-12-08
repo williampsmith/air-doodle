@@ -7,11 +7,11 @@
 #include <limits>
 #include <vector>
 #include <algorithm>
-#include <string.h>
+#include <string>
 
 // Multithreading libs
 #include <pthread.h>
-#include <semaphore.h>
+//#include <semaphore.h>
 
 // Bluetooth & socket libs
 #include <sys/socket.h>
@@ -51,7 +51,7 @@
 // Second Stage Thread Functions
 void irq_handler();	// Handles interrupts and function calls
 void analyze(void* args);	// Parse input acceleration matrix
-void send(uint32_t num, uint32_t gesture);		// Send character and position to waiting edison
+void send(uint8_t tNum, uint8_t gesture);	// Send character and position to waiting edison
 void logInput();	// Response for button interrupt to start logging data
 
 // Bluetooth global variables
@@ -59,16 +59,17 @@ int blue_sock, status;
 struct sockaddr_rc blue_conn = {0};
 
 // BNO055 global variables
-Adafruit_BNO055_Pi bno055;
+Adafruit_BNO055 bno055;
 
 // Threaded globals
-mutex_t blue;
-mutex_t newData;
-mutex_t threads;
-pthread_attr_t attr;
-uint32_t aliveThreads = 0;
-uint32_t nThread = 0;
+pthread_mutexattr_t mutex_attr;
+pthread_attr_t thread_attr;
+pthread_mutex_t blue;
+pthread_mutex_t newData;
+pthread_mutex_t threads;
+uint8_t aliveThreads = 0;
+uint8_t nThread = 0;
 typedef struct {
-	uint32_t threadNum;
+	uint8_t threadNum;
 	GRT::MatrixFloat matrix;
 } thread_arg_struct;

@@ -22,26 +22,26 @@ void irq_handler() {
 // ---------- HELPER FUNCTIONS -----------
 
 // Transmit gesture classification via the bluetooth connection
-void send(uint32_t num, uint32_t gesture) {
+void send(uint8_t tNum, uint8_t gesture) {
 	// Acquire blue lock
 	pthread_mutex_lock(&blue);
 
 	// Send thread number for ordering
-	status = write(blue_sock, (char *) &num);
+	status = write(blue_sock, (char *) &tNum, 1);
 	while (status < 0) {
-		std::cout << "Error sending " << threadNum << " to server\n";
+		std::cout << "Error sending " << tNum << " to server... ";
 		delay(50);
 		std::cout << "Trying again...\n";
-		status = write(blue_sock, (char *) &num)
+		status = write(blue_sock, (char *) &tNum, 1)
 	}
 
 	// Send gesture label
-	status = write(blue_sock, (char *) &gesture);
+	status = write(blue_sock, (char *) &gesture, 1);
 	while (status < 0) {
-		std::cout << "Error sending " << threadNum << " to server\n";
+		std::cout << "Error sending " << gesture << " to server... ";
 		delay(50);
 		std::cout << "Trying again...\n";
-		status = write(blue_sock, (char *) &num)
+		status = write(blue_sock, (char *) &gesture, 1)
 	}
 
 	// Release blue lock
@@ -64,7 +64,7 @@ void analyze(void* args) {
 		std::cout << "Failed to perform prediction for sample " << inputs.threadNum << "\n";
 		return
 	}
-	uint gesture = pipeline.getPredictedClassLabel();
+	uint8_t gesture = pipeline.getPredictedClassLabel();
 
 	// Send threadNum and recognized gesture to bluetooth function
 	send(inputs.threadNum, gesture);
@@ -99,12 +99,12 @@ void logInput() {
 
 	// Create structs for new thread
 	pthread_t pth;
-	struct thread_arg_struct inputs;
-	inputs.threadNum = nThread;
-	inputs.matrix = input_matrix;
+	thread_arg_struct inputs;
+	inputs->threadNum = nThread;
+	inputs->matrix = input_matrix;
 
 	// Split off into new thread for analysis
-	pthread_create(&pth, &attr, analyze, (void *) &inputs);
+	pthread_create(&pth, &thread_attr, analyze, (void *) &inputs);
 
 	// Increment thread counts
 	pthread_mutex_lock(&threads);
@@ -119,7 +119,7 @@ void logInput() {
 int main(int argc, char **argv) {
 	// Setup wiringPi
 	if (wiringPiSetup() < 0) {
-      std::cout << "Unable to setup wiringPi: " << strerror(errno) << "\n";
+      std::cout << "Unable to setup wiringPi: " << string::strerror(errno) << "\n";
       return EXIT_FAILURE;
   	}
 
@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
   	pinMode(BUTTON1_PIN, INPUT);
 
   	// Setup sensor
-  	bno055 = Adafruit_BNO055_Pi(55);
+  	bno055 = Adafruit_BNO055(55);
   	bno055.begin();
   	bno055.setExtCrystalUse(true);
 
@@ -143,18 +143,31 @@ int main(int argc, char **argv) {
 	}
 
 	// Setup threaded environment & mutexes
-	pthread_mutex_init(&blue);
-	pthread_mutex_init(&newData);
-	pthread_mutex_init(&threads);
-	if (pthread_attr_init(&attr) != 0) {
+	if (pthread_mutexattr_init(&mutex_attr) != 0) {
+		std::cout << "Error initializing mutex attr.\n";
+		return EXIT_FAILURE;
+	}
+	if (pthread_mutex_init(&blue, &mutex_attr) != 0) {
+		std::cout << "Error creating blue mutex.\n";
+		return EXIT_FAILURE;
+	}
+	if (pthread_mutex_init(&newData, &mutex_attr) != 0) {
+		std::cout << "Error creating newData mutex.\n";
+		return EXIT_FAILURE;
+	}
+	if (pthread_mutex_init(&threads, &mutex_attr) != 0) {
+		std::cout << "Error creating threads mutex.\n";
+		return EXIT_FAILURE;
+	}
+	if (pthread_attr_init(&thread_attr) != 0) {
 		std::cout << "Error in pthread_attr_init\n";
 		return EXIT_FAILURE;
 	}
-	if (pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED) != 0) {
+	if (pthread_attr_setdetachstate(&thread_attr, PTHREAD_CREATE_DETACHED) != 0) {
 		std::cout << "Error in pthread_attr_setdetachstate\n";
 		return EXIT_FAILURE;
 	}
-	
+
 	// Setup interrupts
 	if (wiringPiISR(BUTTON0_PIN, INT_EDGE_FALLING, &irq_handler) < 0 ) {
     	std::cout << "Unable to setup ISR: " << strerror(errno) << "\n";

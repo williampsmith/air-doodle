@@ -14,7 +14,7 @@ ls -l /dev/i2c*
 #i2cdetect -y 0...n
 
 # Setting up and testing bluetooth on Pi
-sudo bluetoothctl
+#sudo bluetoothctl
 # -> power on
 # -> agent on
 # -> scan on
