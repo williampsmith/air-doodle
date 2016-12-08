@@ -50,9 +50,10 @@
 
 // Second Stage Thread Functions
 void irq_handler();	// Handles interrupts and function calls
-void analyze(void* args);	// Parse input acceleration matrix
+void* analyze(void* args);	// Parse input acceleration matrix
 void send(uint8_t tNum, uint8_t gesture);	// Send character and position to waiting edison
 void logInput();	// Response for button interrupt to start logging data
+void decrementThreads();	// Decrements number of threads currently running
 
 // Bluetooth global variables
 int blue_sock, status;

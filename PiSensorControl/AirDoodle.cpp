@@ -32,7 +32,7 @@ void send(uint8_t tNum, uint8_t gesture) {
 		std::cout << "Error sending " << tNum << " to server... ";
 		delay(50);
 		std::cout << "Trying again...\n";
-		status = write(blue_sock, (char *) &tNum, 1)
+		status = write(blue_sock, (char *) &tNum, 1);
 	}
 
 	// Send gesture label
@@ -41,38 +41,46 @@ void send(uint8_t tNum, uint8_t gesture) {
 		std::cout << "Error sending " << gesture << " to server... ";
 		delay(50);
 		std::cout << "Trying again...\n";
-		status = write(blue_sock, (char *) &gesture, 1)
+		status = write(blue_sock, (char *) &gesture, 1);
 	}
 
 	// Release blue lock
 	pthread_mutex_unlock(&blue);
 }
 
+// Decrement alive threads
+void decrementThreads() {
+	pthread_mutex_lock(&threads);
+	aliveThreads = aliveThreads - 1;
+	pthread_mutex_unlock(&threads);
+}
+
 // Drop in function for new thread
-void analyze(void* args) {
-	struct thread_arg_struct *inputs = args;
+void* analyze(void* args) {
+	thread_arg_struct* inputs = (thread_arg_struct*) args;
 
 	//Setup a custom recognition pipeline
   	GRT::GestureRecognitionPipeline pipeline;
   	if (!pipeline.load("DTW_Pipeline_Model.txt")) {
   		std::cout << "Failed to load the classifier model\n";
-  		return
+		decrementThreads();
+  		return NULL;
   	}
 
 	// Predict gesture using the classifier
-	if (!pipeline.predict(inputs.matrix)) {
-		std::cout << "Failed to perform prediction for sample " << inputs.threadNum << "\n";
-		return
+	if (!pipeline.predict(inputs->matrix)) {
+		std::cout << "Failed to perform prediction for thread " << inputs->threadNum << "\n";
+		decrementThreads();
+		return NULL;
 	}
 	uint8_t gesture = pipeline.getPredictedClassLabel();
 
 	// Send threadNum and recognized gesture to bluetooth function
-	send(inputs.threadNum, gesture);
+	send(inputs->threadNum, gesture);
 
-	// Decrement alive threads
-	pthread_mutex_lock(&threads);
-	aliveThreads = aliveThreads - 1;
-	pthread_mutex_unlock(&threads);
+	// End of thread run
+	decrementThreads();
+	return NULL;
 }
 
 // Logging function
@@ -93,18 +101,18 @@ void logInput() {
 		input_vector[3] = (float) accel[0];
 		input_vector[4] = (float) accel[1];
 		input_vector[5] = (float) accel[2];
-		input_matrix.push_back(grt_vector);
+		input_matrix.push_back(input_vector);
 		move = std::sqrt(accel[0]*accel[0] + accel[1]*accel[1] + accel[2]*accel[2]);
 	}
 
 	// Create structs for new thread
 	pthread_t pth;
 	thread_arg_struct inputs;
-	inputs->threadNum = nThread;
-	inputs->matrix = input_matrix;
+	inputs.threadNum = nThread;
+	inputs.matrix = input_matrix;
 
 	// Split off into new thread for analysis
-	pthread_create(&pth, &thread_attr, analyze, (void *) &inputs);
+	pthread_create(&pth, &thread_attr, &analyze, &inputs);
 
 	// Increment thread counts
 	pthread_mutex_lock(&threads);
@@ -119,7 +127,7 @@ void logInput() {
 int main(int argc, char **argv) {
 	// Setup wiringPi
 	if (wiringPiSetup() < 0) {
-      std::cout << "Unable to setup wiringPi: " << string::strerror(errno) << "\n";
+      std::cout << "Unable to setup wiringPi: " << strerror(errno) << "\n";
       return EXIT_FAILURE;
   	}
 
@@ -132,11 +140,11 @@ int main(int argc, char **argv) {
   	bno055.setExtCrystalUse(true);
 
     // Setup and connect via bluetooth to display unit
-    blue_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+	blue_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 	blue_conn.rc_family = AF_BLUETOOTH;
 	blue_conn.rc_channel = (uint8_t) SERVER_CHANNEL;
 	str2ba(SERVER_BADDR_CHAR, &blue_conn.rc_bdaddr);
-	status = connect(s, (struct sockaddr *) &blue_conn, sizeof(blue_conn));
+	status = connect(blue_sock, (struct sockaddr *) &blue_conn, sizeof(blue_conn));
 	if (status < 0) {
 		std::cout << "Error connecting to server\n";
 		return EXIT_FAILURE;
