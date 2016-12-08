@@ -15,9 +15,8 @@
 
 // Bluetooth & socket libs
 #include <sys/socket.h>
-#include <bluetooth/bluetooth.h> // Bluez dev lib written for Raspberry Pi
-#include <bluetooth/hci.h> // Bluez dev lib written for Raspberry Pi
-#include <bluetooth/hci_lib.h> // Bluez dev lib written for Raspberry Pi
+#include <bluetooth/bluetooth.h> // Bluetooth dev lib written for Raspberry Pi
+#include <bluetooth/rfcomm.h>  // More dev libs written for Raspberry Pi
 
 // Sensor lib
 #include "Adafruit_BNO055_Pi.h" // Adafruit BNO055 9-DOF sensor
@@ -57,10 +56,10 @@ void decrementThreads();	// Decrements number of threads currently running
 
 // Bluetooth global variables
 int blue_sock, status;
-struct sockaddr_rc blue_conn = {0};
+sockaddr_rc blue_conn = {0};
 
 // BNO055 global variables
-Adafruit_BNO055 bno055;
+struct Adafruit_BNO055 bno055;
 
 // Threaded globals
 pthread_mutexattr_t mutex_attr;
