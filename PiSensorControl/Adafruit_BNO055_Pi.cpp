@@ -441,7 +441,6 @@ bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, byte value) {
 // Reads an 8 bit value over I2C
 byte Adafruit_BNO055::read8(adafruit_bno055_reg_t reg ) {
   byte value = 0;
-
   value = wiringPiI2CReadReg8(i2c, reg);
 
   return value;

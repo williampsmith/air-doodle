@@ -151,7 +151,7 @@ int main(int argc, char **argv) {
 		tmp = bno055.getVector(bno055.VECTOR_EULER);
 		std::cout << "Orientation => x: " << tmp[0] << " y: " << tmp[1] << " z: " << tmp[2] << "\n";
 		std::cout << "\n";
-		delay(1000);
+		delay(100);
 	}
 
     	// Setup and connect via bluetooth to display unit
