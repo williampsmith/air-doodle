@@ -23,6 +23,8 @@
 
 #include <iostream>
 #include <limits>
+#include <vector>
+#include <string.h>
 
 #include <wiringPi.h>
 #include <wiringPiI2C.h>

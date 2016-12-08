@@ -136,7 +136,11 @@ int main(int argc, char **argv) {
 
   	// Setup sensor
   	bno055 = Adafruit_BNO055(55);
-  	bno055.begin();
+  	while (!bno055.begin()) {
+		std::cout << "Oops, no BNO055 detected ... Check your wiring or I2C ADDR!\n";
+		delay(500);
+		std::cout << "Trying Again...\n";
+	}
   	bno055.setExtCrystalUse(true);
 
     // Setup and connect via bluetooth to display unit
