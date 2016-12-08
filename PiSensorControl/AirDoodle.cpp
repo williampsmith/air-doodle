@@ -93,7 +93,7 @@ void logInput() {
 
 	// Read new data until movemnet stops
 	while (move > 1.1) {
-		accel = bno055.getVector(bno055.VECTOR_ACCELEROMETER);
+		accel = bno055.getVector(bno055.VECTOR_LINEARACCEL);
 		gyro = bno055.getVector(bno055.VECTOR_EULER);
 		input_vector[0] = (float) gyro[0];
 		input_vector[1] = (float) gyro[1];
@@ -127,8 +127,8 @@ void logInput() {
 int main(int argc, char **argv) {
 	// Setup wiringPi
 	if (wiringPiSetup() < 0) {
-      std::cout << "Unable to setup wiringPi: " << strerror(errno) << "\n";
-      return EXIT_FAILURE;
+		std::cout << "Unable to setup wiringPi: " << strerror(errno) << "\n";
+	      	return EXIT_FAILURE;
   	}
 
   	// Setup buttons
@@ -143,7 +143,18 @@ int main(int argc, char **argv) {
 	}
   	bno055.setExtCrystalUse(true);
 
-    // Setup and connect via bluetooth to display unit
+	// Test code for bno055
+	while (true) {
+		std::vector<double> tmp;
+		tmp = bno055.getVector(bno055.VECTOR_LINEARACCEL);
+		std::cout << "Acceleration => x: " << tmp[0] << " y: " << tmp[1] << " z: " << tmp[2] << "\n";
+		tmp = bno055.getVector(bno055.VECTOR_EULER);
+		std::cout << "Orientation => x: " << tmp[0] << " y: " << tmp[1] << " z: " << tmp[2] << "\n";
+		std::cout << "\n";
+		delay(1000);
+	}
+
+    	// Setup and connect via bluetooth to display unit
 	blue_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 	blue_conn.rc_family = AF_BLUETOOTH;
 	blue_conn.rc_channel = (uint8_t) SERVER_CHANNEL;

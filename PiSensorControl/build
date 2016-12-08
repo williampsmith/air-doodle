@@ -1,4 +1,4 @@
-#!/bin/bash/
+#!/bin/sh -e
 
-# COMPILATION => might need: -I/usr/local/include -Wall -Wno-long
+# Makefile for AirDoodle on Raspberry Pi
 g++ -std=c++11 -pthread Adafruit_BNO055_Pi.cpp AirDoodle.cpp -o AirDoodle -lwiringPi -lbluetooth -lgrt

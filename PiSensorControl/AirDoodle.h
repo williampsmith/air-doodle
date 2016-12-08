@@ -36,7 +36,7 @@
 #define SERVER_CHANNEL	1 // Channel for the bluetooth connection
 #define SERVER_BADDR_CHAR "58:A8:39:00:55:1A" // Bluetooth MAC address for the edison
 
-#define I2C_BAUD 115200 // Baudrate for i2c
+#define I2C_BAUD 38400 // Baudrate for i2c
 
 
 // ---------- FUNCTION DEFINITIONS -----------
