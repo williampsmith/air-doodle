@@ -51,7 +51,7 @@
 // Second Stage Thread Functions
 void irq_handler();	// Handles interrupts and function calls
 void analyze(void* args);	// Parse input acceleration matrix
-void send(uint32_t num, uint32_t gesture);		// Send character and position to waiting edison
+void send(uint8_t num, uint8_t gesture);		// Send character and position to waiting edison
 void logInput();	// Response for button interrupt to start logging data
 
 // Bluetooth global variables
@@ -66,9 +66,9 @@ mutex_t blue;
 mutex_t newData;
 mutex_t threads;
 pthread_attr_t attr;
-uint32_t aliveThreads = 0;
-uint32_t nThread = 0;
+uint8_t aliveThreads = 0;
+uint8_t nThread = 0;
 typedef struct {
-	uint32_t threadNum;
+	uint8_t threadNum;
 	GRT::MatrixFloat matrix;
 } thread_arg_struct;

@@ -22,14 +22,14 @@ void irq_handler() {
 // ---------- HELPER FUNCTIONS -----------
 
 // Transmit gesture classification via the bluetooth connection
-void send(uint32_t num, uint32_t gesture) {
+void send(uint8_t num, uint8_t gesture) {
 	// Acquire blue lock
 	pthread_mutex_lock(&blue);
 
 	// Send thread number for ordering
 	status = write(blue_sock, (char *) &num);
 	while (status < 0) {
-		std::cout << "Error sending " << threadNum << " to server\n";
+		std::cout << "Error sending " << threadNum << " to server... " << endl;
 		delay(50);
 		std::cout << "Trying again...\n";
 		status = write(blue_sock, (char *) &num)
@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
 	blue_conn.rc_family = AF_BLUETOOTH;
 	blue_conn.rc_channel = (uint8_t) SERVER_CHANNEL;
 	str2ba(SERVER_BADDR_CHAR, &blue_conn.rc_bdaddr);
-	status = connect(s, (struct sockaddr *)&blue_conn, sizeof(blue_conn));
+	status = connect(s, (struct sockaddr *) &blue_conn, sizeof(blue_conn));
 	if (status < 0) {
 		std::cout << "Error connecting to server\n";
 		return EXIT_FAILURE;
