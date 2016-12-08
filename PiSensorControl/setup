@@ -1,8 +1,8 @@
-#!/bin/bash/
+#!/bin/sh -e
 # INSTALLATION
 
 # Install library files for bluetooth control
-sudo apt-get install bluetooth libbluetooth-dev bluez-utils blueman
+sudo apt-get install bluetooth libbluetooth-dev blueman
 
 # Install library files for i2c control
 sudo apt-get install libi2c-dev
