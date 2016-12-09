@@ -93,8 +93,8 @@ void logInput() {
 
 	// Read new data until movemnet stops
 	while (move > 1.1) {
-		accel = bno055.getVector(bno055.VECTOR_LINEARACCEL);
-		gyro = bno055.getVector(bno055.VECTOR_EULER);
+		accel = bno055.getVector(bno055.VECTOR_ACCELEROMETER);
+		gyro = bno055.getVector(bno055.VECTOR_GYROSCOPE);
 		input_vector[0] = (float) gyro[0];
 		input_vector[1] = (float) gyro[1];
 		input_vector[2] = (float) gyro[2];
@@ -144,15 +144,16 @@ int main(int argc, char **argv) {
   	bno055.setExtCrystalUse(true);
 
 	// Test code for bno055
-	// while (true) {
-	// 	std::vector<double> tmp;
-	// 	tmp = bno055.getVector(bno055.VECTOR_LINEARACCEL);
-	// 	std::cout << "Acceleration => x: " << tmp[0] << " y: " << tmp[1] << " z: " << tmp[2] << "\n";
-	// 	tmp = bno055.getVector(bno055.VECTOR_EULER);
-	// 	std::cout << "Orientation => x: " << tmp[0] << " y: " << tmp[1] << " z: " << tmp[2] << "\n";
-	// 	std::cout << "\n";
-	// 	delay(100);
-	// }
+	sensors_event_t tmpe;
+	std::vector<double> tmpg;
+	while (true) {
+	 	bno055.getEvent(&tmpe);
+	 	std::cout << "Acceleration => x: " << tmpe.orientation.x << " y: " << tmpe.orientation.y << " z: " << tmpe.orientation.z << "\n";
+	 	tmpg = bno055.getVector(bno055.VECTOR_LINEARACCEL);
+	 	std::cout << "Orientation => x: " << tmpg[0] << " y: " << tmpg[1] << " z: " << tmpg[2] << "\n";
+	 	std::cout << "\n";
+	 	delay(100);
+	}
 
     	// Setup and connect via bluetooth to display unit
 	blue_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
