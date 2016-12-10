@@ -1,4 +1,4 @@
 #!/bin/sh -e
 
-# Makefile for AirDoodle on Raspberry Pi
+# Buildfile for AirDoodle on Raspberry Pi
 g++ -std=c++11 -pthread Adafruit_BNO055_Pi.cpp AirDoodle.cpp -o AirDoodle -lwiringPi -lbluetooth -lgrt

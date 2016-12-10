@@ -35,6 +35,7 @@ void send(uint8_t tNum, uint8_t gesture) {
 		status = write(blue_sock, (char *) &tNum, 1);
 	}
 
+	delay(500)
 	// Send gesture label
 	status = write(blue_sock, (char *) &gesture, 1);
 	while (status < 0) {
