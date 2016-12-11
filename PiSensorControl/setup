@@ -6,7 +6,7 @@ sudo apt-get update
 
 # Install python libraries and dependencies
 # Can be either 2 or 3 but needs accompanying pip and pybluez install
-sudo apt-get isntall python2 
+sudo apt-get isntall python python-pip
 
 # Install library files for bluetooth control
 sudo apt-get install bluetooth libbluetooth-dev
@@ -18,6 +18,16 @@ sudo sed -i '8s/.*/ExecStart=\/usr\/lib\/bluetooth\/bluetoothd -C/' /etc/systemd
 
 # Install library files for i2c control
 sudo apt-get install libi2c-dev
+
+mkdir tmp
+cd tmp
+wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.51.tar.gz
+tar zxvf bcm2835-1.51.tar.gz
+cd bcm2835-1.51
+./configure
+make
+sudo make check
+sudo make install
 
 # TESTING
 
