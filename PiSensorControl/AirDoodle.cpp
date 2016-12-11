@@ -151,8 +151,9 @@ int main(int argc, char **argv) {
 
   	// Setup BNO055 sensor
  	bno055 = Adafruit_BNO055(-1, BNO055_ADDRESS, I2C_PI, false);
+ 	//bno055 = Adafruit_BNO055(); // Needs more work (uart not connecting)
  	while (!bno055.begin()) {
-		std::cout << "Oops, no sensor connected ... Check your wiring or I2C ADDR!\n";
+		std::cout << "Oops, no sensor connected ... Check your wiring or ADDR!\n";
 		delay(500);
 		std::cout << "Trying Again...\n";
 	}
@@ -164,8 +165,8 @@ int main(int argc, char **argv) {
 		to = bno055.getVector(bno055.VECTOR_EULER);
 		ta = bno055.getVector(bno055.VECTOR_LINEARACCEL);
 		std::cout << to[0] << "\t" << to[1] << "\t" << to[2] << "\t" << ta[0] << "\t" << ta[1] << "\t" << ta[2] << "\n";
- 	 fflush(stdout);
- 	 delay(100);
+ 	 	fflush(stdout);
+ 	 	delay(100);
 	}
 
   	// Setup MPU6050 sensor
@@ -186,7 +187,7 @@ int main(int argc, char **argv) {
  	//  delay(100);
 	// }
 
-    // Setup and connect via bluetooth to display unit
+        // Setup and connect via bluetooth to display unit
 	blue_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 	blue_conn.rc_family = AF_BLUETOOTH;
 	blue_conn.rc_channel = (uint8_t) SERVER_CHANNEL;
