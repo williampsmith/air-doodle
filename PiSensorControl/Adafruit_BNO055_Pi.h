@@ -21,26 +21,22 @@
  * Updated by Mitchell Oleson for Air Doodle and other projects on the Raspberry Pi.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
-
-#include <errno.h>
-#include <unistd.h>
 #include <iostream>
+#include <limits>
+#include <vector>
+#include <string.h>
 
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 
-#include <math.h>
-#include <Pi_Sensor.h>
-#include <utility/imumaths.h>
+#include "Adafruit_Sensor_Pi.h"
 
 #define BNO055_ADDRESS  0x28
 #define BNO055_ID       0xA0
 
 #define NUM_BNO055_OFFSET_REGISTERS 22
+
+typedef uint8_t	byte;
 
 typedef struct {
     uint16_t accel_offset_x;
@@ -57,7 +53,7 @@ typedef struct {
     uint16_t mag_radius;
 } adafruit_bno055_offsets_t;
 
-class Adafruit_BNO055 : public Pi_Sensor {
+class Adafruit_BNO055 : public Adafruit_Sensor {
   public:
     typedef enum {
       // Page id register definition
@@ -270,20 +266,19 @@ class Adafruit_BNO055 : public Pi_Sensor {
       VECTOR_GRAVITY       = BNO055_GRAVITY_DATA_X_LSB_ADDR
     } adafruit_vector_type_t;
 
-    BNO055 ( int32_t sensorID = -1, uint8_t address = BNO055_ADDRESS );
+    Adafruit_BNO055 ( int32_t sensorID = -1, uint8_t address = BNO055_ADDRESS );
     bool  begin               ( adafruit_bno055_opmode_t mode = OPERATION_MODE_NDOF );
     void  setMode             ( adafruit_bno055_opmode_t mode );
     void  getRevInfo          ( adafruit_bno055_rev_info_t* );
     void  displayRevInfo      ( void );
-    void  setExtCrystalUse    ( boolean usextal );
+    void  setExtCrystalUse    ( bool usextal );
     void  getSystemStatus     ( uint8_t *system_status,
                                 uint8_t *self_test_result,
                                 uint8_t *system_error);
     void  displaySystemStatus ( void );
     void  getCalibration      ( uint8_t* system, uint8_t* gyro, uint8_t* accel, uint8_t* mag);
 
-    imu::Vector<3>  getVector ( adafruit_vector_type_t vector_type );
-    imu::Quaternion getQuat   ( void );
+    std::vector<double>  getVector ( adafruit_vector_type_t vector_type );
     int8_t          getTemp   ( void );
 
     // Adafruit_Sensor implementation

@@ -21,7 +21,7 @@
  * Updated by Mitchell Oleson for Air Doodle and other projects on the Raspberry Pi.
  */
 
-#include "Adafruit_BNO055.h"
+#include "Adafruit_BNO055_Pi.h"
 
 // Creates a new sensor
 Adafruit_BNO055::Adafruit_BNO055(int32_t sensorID, uint8_t address) {
@@ -39,10 +39,10 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode) {
 
   // Make sure we have the right device
   uint8_t id = read8(BNO055_CHIP_ID_ADDR);
-  if(id != BNO055_ID) {
+  if (id != BNO055_ID) {
     delay(1000); // hold on for boot
     id = read8(BNO055_CHIP_ID_ADDR);
-    if(id != BNO055_ID) {
+    if (id != BNO055_ID) {
       return false;  // still not? ok bail
     }
   }
@@ -80,7 +80,7 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode) {
   write8(BNO055_AXIS_MAP_SIGN_ADDR, REMAP_SIGN_P2); // P0-P7, Default is P1
   delay(10);
   */
-  
+
   write8(BNO055_SYS_TRIGGER_ADDR, 0x0);
   delay(10);
   // Set the requested operating mode (see section 3.3)
@@ -98,7 +98,7 @@ void Adafruit_BNO055::setMode(adafruit_bno055_opmode_t mode) {
 }
 
 // Use the external 32.768KHz crystal
-void Adafruit_BNO055::setExtCrystalUse(boolean usextal) {
+void Adafruit_BNO055::setExtCrystalUse(bool usextal) {
   adafruit_bno055_opmode_t modeback = _mode;
 
   // Switch to config mode (just in case since this is the default)
@@ -219,8 +219,8 @@ int8_t Adafruit_BNO055::getTemp(void) {
 }
 
 // Gets a vector reading from the specified source
-imu::Vector<3> Adafruit_BNO055::getVector(adafruit_vector_type_t vector_type) {
-  imu::Vector<3> xyz;
+std::vector<double> Adafruit_BNO055::getVector(adafruit_vector_type_t vector_type) {
+  std::vector<double> xyz(3);
   uint8_t buffer[6];
   memset (buffer, 0, 6);
 
@@ -268,29 +268,6 @@ imu::Vector<3> Adafruit_BNO055::getVector(adafruit_vector_type_t vector_type) {
   return xyz;
 }
 
-// Gets a quaternion reading from the specified source
-imu::Quaternion Adafruit_BNO055::getQuat(void) {
-  uint8_t buffer[8];
-  memset (buffer, 0, 8);
-
-  int16_t x, y, z, w;
-  x = y = z = w = 0;
-
-  // Read quat data (8 bytes)
-  readLen(BNO055_QUATERNION_DATA_W_LSB_ADDR, buffer, 8);
-  w = (((uint16_t)buffer[1]) << 8) | ((uint16_t)buffer[0]);
-  x = (((uint16_t)buffer[3]) << 8) | ((uint16_t)buffer[2]);
-  y = (((uint16_t)buffer[5]) << 8) | ((uint16_t)buffer[4]);
-  z = (((uint16_t)buffer[7]) << 8) | ((uint16_t)buffer[6]);
-
-  // Assign to Quaternion
-  // See http://ae-bst.resource.bosch.com/media/products/dokumente/bno055/BST_BNO055_DS000_12~1.pdf
-  // 3.6.5.5 Orientation (Quaternion)
-  const double scale = (1.0 / (1<<14));
-  imu::Quaternion quat(scale * w, scale * x, scale * y, scale * z);
-  return quat;
-}
-
 // Provides the sensor_t data for this sensor
 void Adafruit_BNO055::getSensor(sensor_t *sensor) {
   // Clear the sensor_t object
@@ -319,10 +296,10 @@ bool Adafruit_BNO055::getEvent(sensors_event_t *event) {
   event->timestamp = millis();
 
   // Get a Euler angle sample for orientation
-  imu::Vector<3> euler = getVector(Adafruit_BNO055::VECTOR_EULER);
-  event->orientation.x = euler.x();
-  event->orientation.y = euler.y();
-  event->orientation.z = euler.z();
+  std::vector<double> euler = getVector(Adafruit_BNO055::VECTOR_EULER);
+  event->orientation.x = euler[0];
+  event->orientation.y = euler[1];
+  event->orientation.z = euler[2];
 
   return true;
 }
@@ -464,7 +441,6 @@ bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, byte value) {
 // Reads an 8 bit value over I2C
 byte Adafruit_BNO055::read8(adafruit_bno055_reg_t reg ) {
   byte value = 0;
-
   value = wiringPiI2CReadReg8(i2c, reg);
 
   return value;
