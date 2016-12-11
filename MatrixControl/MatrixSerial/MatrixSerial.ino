@@ -50,7 +50,7 @@ void loop() {
         matrix.fillScreen(matrix.Color333(0, 0, 0));
       }
       matrix.setTextColor(matrix.Color333(0,1,0));
-      matrix.setCursor(10, 10);   // start at top left, with one pixel of spacing
+      matrix.setCursor(11, 9);   // start at top left, with one pixel of spacing
       matrix.setTextSize(2);    // size 1 == 8 pixels high
       matrix.print(letter);
     }
@@ -68,7 +68,7 @@ void loop() {
       }
    
 //      // start at (0,0) and draw bitmap to (32,32) with the given color
-//      matrix.drawBitmap(0, 0, bitmap, dimX, dimY, matrix.Color333(0,1,0));
+      matrix.drawBitmap(0, 0, bitmap, dimX, dimY, matrix.Color333(0,1,0));
 
 // ****************************************************************
 //      drawBitmap(bitmap, 1);
