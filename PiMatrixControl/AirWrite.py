@@ -2,15 +2,15 @@ import serial
 import time
 import bluetooth
 
-# print("Setting up arduino connection.")
+print("Setting up arduino connection.")
 
-# arduino = serial.Serial(port='/dev/ttyS0', baudrate=9600, timeout=0.1)
+arduino = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=0.1)
 
-# time.sleep(1)
-# arduino.setDTR(level=0)
-# time.sleep(1)
+time.sleep(1)
+arduino.setDTR(level=0)
+time.sleep(1)
 
-# print("Arduino connection setup.")
+print("Arduino connection setup.")
 
 print("Setting up bluetooth connection.")
 

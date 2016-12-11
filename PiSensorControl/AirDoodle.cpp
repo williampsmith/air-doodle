@@ -142,27 +142,25 @@ int main(int argc, char **argv) {
   	pinMode(BUTTON1_PIN, INPUT);
 
   	// Setup sensor
-  	bno055 = Adafruit_BNO055(55);
-  	while (!bno055.begin()) {
-		std::cout << "Oops, no BNO055 detected ... Check your wiring or I2C ADDR!\n";
+  	I2Cdev::initialize();
+  	mpu6050 = MPU6050();
+  	while (!mpu6050.testConnection()) {
+		std::cout << "Oops, no sensor connected ... Check your wiring or I2C ADDR!\n";
 		delay(500);
 		std::cout << "Trying Again...\n";
 	}
-  	bno055.setExtCrystalUse(true);
+	mpu6050.initialize();
 
 	// Test code for sensor
-	sensors_event_t tmpe;
-	std::vector<double> tmpg;
+	int16_t ax, ay, az, gx, gy, gz = 0;
 	while (true) {
-	 	bno055.getEvent(&tmpe);
-	 	std::cout << "Acceleration => x: " << tmpe.orientation.x << " y: " << tmpe.orientation.y << " z: " << tmpe.orientation.z << "\n";
-	 	tmpg = bno055.getVector(bno055.VECTOR_LINEARACCEL);
-	 	std::cout << "Orientation => x: " << tmpg[0] << " y: " << tmpg[1] << " z: " << tmpg[2] << "\n";
-	 	std::cout << "\n";
-	 	delay(100);
+		mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+		std::cout << ax << "\t" << ay << "\t" << az << "\t" << gx << "\t" << gy << "\t" << gz << "\n";
+    	fflush(stdout);
+    	bcm2835_delay(100);
 	}
 
-    	// Setup and connect via bluetooth to display unit
+    // Setup and connect via bluetooth to display unit
 	blue_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 	blue_conn.rc_family = AF_BLUETOOTH;
 	blue_conn.rc_channel = (uint8_t) SERVER_CHANNEL;
