@@ -1,8 +1,20 @@
 #!/bin/sh -e
 # INSTALLATION
 
+# Make sure source list up to date
+sudo apt-get update
+
+# Install python libraries and dependencies
+# Can be either 2 or 3 but needs accompanying pip and pybluez install
+sudo apt-get isntall python2 
+
 # Install library files for bluetooth control
-sudo apt-get install bluetooth libbluetooth-dev blueman
+sudo apt-get install bluetooth libbluetooth-dev
+sudo pip install pybluez
+
+# Allow bluetooth sharing (for server)
+sudo sdptool add SP
+sudo sed -i '8s/.*/ExecStart=\/usr\/lib\/bluetooth\/bluetoothd -C/' /etc/systemd/system/dbus-org.bluez.service
 
 # Install library files for i2c control
 sudo apt-get install libi2c-dev
@@ -13,9 +25,10 @@ sudo apt-get install libi2c-dev
 ls -l /dev/i2c*
 #i2cdetect -y 0...n
 
-# Setting up and testing bluetooth on Pi
+# To finish setting up and testing bluetooth on Pi
 #sudo bluetoothctl
 # -> power on
 # -> agent on
 # -> scan on
-# -> connect XX:XX:XX:XX:XX:XX
+# -> pair XX:XX:XX:XX:XX:XX
+# -> trust XX:XX:XX:XX:XX:XX

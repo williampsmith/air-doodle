@@ -126,6 +126,12 @@ void logInput() {
 // ---------- MAIN FUNCTION -----------
 
 int main(int argc, char **argv) {
+	if (argc < 2) {
+		std::cout << "Using default server bluetooth address!";
+	} else {
+		SERVER_BADDR_CHAR = argv[1]
+	}
+
 	// Setup wiringPi
 	if (wiringPiSetup() < 0) {
 		std::cout << "Unable to setup wiringPi: " << strerror(errno) << "\n";
@@ -144,7 +150,7 @@ int main(int argc, char **argv) {
 	}
   	bno055.setExtCrystalUse(true);
 
-	// Test code for bno055
+	// Test code for sensor
 	sensors_event_t tmpe;
 	std::vector<double> tmpg;
 	while (true) {
@@ -215,7 +221,19 @@ int main(int argc, char **argv) {
 		delay(50);
 	}
 
-	// Cleanup and close running processes
+	// Lock bluetooth mutex for sending
+	pthread_mutex_lock(&blue);
+
+	// Send end command to matrix controller
+	status = write(blue_sock, "", 1);
+	while (status < 0) {
+		std::cout << "Error sending end command to server... ";
+		delay(50);
+		std::cout << "Trying again...\n";
+		status = write(blue_sock, "", 1);
+	}
+
+	// Close the bluetooth socket
 	close(blue_sock);
 
 	// Exit

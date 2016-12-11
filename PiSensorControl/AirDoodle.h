@@ -34,9 +34,9 @@
 #define BUTTON1_PIN 1 // Button to exit
 
 #define SERVER_CHANNEL	1 // Channel for the bluetooth connection
-#define SERVER_BADDR_CHAR "58:A8:39:00:55:1A" // Bluetooth MAC address for the edison
+#define SERVER_BADDR_CHAR "B8:27:EB:DE:90:2A" // Bluetooth MAC address for the edison
 
-#define I2C_BAUD 38400 // Baudrate for i2c
+#define I2C_BAUD 38400 // Baudrate for i2c (Don't think I use this....)
 
 
 // ---------- FUNCTION DEFINITIONS -----------
