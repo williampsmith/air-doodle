@@ -91,19 +91,19 @@ void logInput() {
 	double move = 2;
 
 	// Read BNO055 data until movemnet stops
-	std::vector<double> orient;
-	std::vector<double> accel;
+	std::vector<double> vo;
+	std::vector<double> va;
 	while (move > 1.1) {
-		orient = bno055.getVector(bno055.VECTOR_EULER);
-		accel = bno055.getVector(bno055.VECTOR_LINEARACCEL);
-		input_vector[0] = (float) orient[0];
-		input_vector[1] = (float) orient[1];
-		input_vector[2] = (float) orient[2];
-		input_vector[3] = (float) accel[0];
-		input_vector[4] = (float) accel[1];
-		input_vector[5] = (float) accel[2];
+		vo = bno055.getVector(bno055.VECTOR_EULER);
+		va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
+		input_vector[0] = (float) vo[0];
+		input_vector[1] = (float) vo[1];
+		input_vector[2] = (float) vo[2];
+		input_vector[3] = (float) va[0];
+		input_vector[4] = (float) va[1];
+		input_vector[5] = (float) va[2];
 		input_matrix.push_back(input_vector);
-		move = std::sqrt(accel[0]*accel[0] + accel[1]*accel[1] + accel[2]*accel[2]);
+		move = std::sqrt(va[0]*va[0] + va[1]*va[1] + va[2]*va[2]);
 	}
 
 	// Read MPU6050 data until movemnet stops
@@ -159,12 +159,12 @@ int main(int argc, char **argv) {
 	}
 
 	// Test code for BNO055 sensor
-	std::vector<double> to;
-	std::vector<double> ta;
+	std::vector<double> vo;
+	std::vector<double> va;
 	while (true) {
-		to = bno055.getVector(bno055.VECTOR_EULER);
-		ta = bno055.getVector(bno055.VECTOR_LINEARACCEL);
-		std::cout << to[0] << "\t" << to[1] << "\t" << to[2] << "\t" << ta[0] << "\t" << ta[1] << "\t" << ta[2] << "\n";
+		vo = bno055.getVector(bno055.VECTOR_EULER);
+		va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
+		std::cout << vo[0] << "\t" << vo[1] << "\t" << vo[2] << "\t" << va[0] << "\t" << va[1] << "\t" << va[2] << "\n";
  	 	fflush(stdout);
  	 	delay(100);
 	}

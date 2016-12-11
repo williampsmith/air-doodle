@@ -1,4 +1,8 @@
 #!/bin/sh -e
-
 # Buildfile for DataCollection on Raspberry Pi
-g++ I2Cdev.cpp MPU6050.cpp DataCollection.cpp -o DataCollection -lwiringPi
+
+# With BNO055
+g++ Adafruit_BNO055_Pi.cpp DataCollection.cpp -o DataCollection -lwiringPi
+
+# With MPU6050
+#g++ I2Cdev.cpp MPU6050.cpp DataCollection.cpp -o DataCollection -lwiringPi

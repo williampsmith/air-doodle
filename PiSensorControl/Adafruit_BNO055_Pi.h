@@ -28,12 +28,8 @@
 #include <string.h>
 #include <termios.h>
 #include <time.h>
-#include <linux/i2c-dev.h>
 #include <fcntl.h>
-//#include <sys/types.h>
-//#include <sys/stat.h>
-
-//#include <wiringPi.h>
+#include <linux/i2c-dev.h>
 
 #include "Adafruit_Sensor_Pi.h"
 
