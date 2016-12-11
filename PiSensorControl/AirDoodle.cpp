@@ -35,7 +35,7 @@ void send(uint8_t tNum, uint8_t gesture) {
 		status = write(blue_sock, (char *) &tNum, 1);
 	}
 
-	delay(500)
+	delay(500);
 	// Send gesture label
 	status = write(blue_sock, (char *) &gesture, 1);
 	while (status < 0) {
@@ -94,8 +94,8 @@ void logInput() {
 
 	// Read new data until movemnet stops
 	while (move > 1.1) {
-		accel = bno055.getVector(bno055.VECTOR_ACCELEROMETER);
-		gyro = bno055.getVector(bno055.VECTOR_GYROSCOPE);
+//		accel = bno055.getVector(bno055.VECTOR_ACCELEROMETER);
+//		gyro = bno055.getVector(bno055.VECTOR_GYROSCOPE);
 		input_vector[0] = (float) gyro[0];
 		input_vector[1] = (float) gyro[1];
 		input_vector[2] = (float) gyro[2];
@@ -126,11 +126,11 @@ void logInput() {
 // ---------- MAIN FUNCTION -----------
 
 int main(int argc, char **argv) {
-	if (argc < 2) {
-		std::cout << "Using default server bluetooth address!";
-	} else {
-		SERVER_BADDR_CHAR = argv[1]
-	}
+//	if (argc < 2) {
+//		std::cout << "Using default server bluetooth address!";
+//	} else {
+//		SERVER_BADDR_CHAR = argv[1]
+//	}
 
 	// Setup wiringPi
 	if (wiringPiSetup() < 0) {
@@ -142,14 +142,14 @@ int main(int argc, char **argv) {
   	pinMode(BUTTON1_PIN, INPUT);
 
   	// Setup sensor
-  	I2Cdev::initialize();
+//  	I2Cdev::initialize();
   	mpu6050 = MPU6050();
+	mpu6050.initialize();
   	while (!mpu6050.testConnection()) {
 		std::cout << "Oops, no sensor connected ... Check your wiring or I2C ADDR!\n";
 		delay(500);
 		std::cout << "Trying Again...\n";
 	}
-	mpu6050.initialize();
 
 	// Test code for sensor
 	int16_t ax, ay, az, gx, gy, gz = 0;
@@ -157,7 +157,7 @@ int main(int argc, char **argv) {
 		mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 		std::cout << ax << "\t" << ay << "\t" << az << "\t" << gx << "\t" << gy << "\t" << gz << "\n";
     	fflush(stdout);
-    	bcm2835_delay(100);
+    	delay(100);
 	}
 
     // Setup and connect via bluetooth to display unit

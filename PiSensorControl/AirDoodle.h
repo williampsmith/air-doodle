@@ -19,7 +19,7 @@
 #include <bluetooth/rfcomm.h>  // More dev libs written for Raspberry Pi
 
 // Sensor lib
-#include <bcm2835.h>
+//#include <bcm2835.h>
 #include "I2Cdev.h"
 #include "MPU6050.h"
 
@@ -61,7 +61,7 @@ int blue_sock, status;
 sockaddr_rc blue_conn = {0};
 
 // BNO055 global variables
-MPU6050 bno055;
+MPU6050 mpu6050;
 
 // Threaded globals
 pthread_mutexattr_t mutex_attr;
