@@ -13,7 +13,7 @@ def writeToSerial(destination, bitmap, shouldClearDisplay = 1, timeout = 0.04):
     # bitmap: the list of bytes to send, top left to bottom right
     # shouldClearDisplay: should it reset the display (set to blank display) before displaying bitmap
     # timeout: time to wait to let data get delivered to Arduino
-    data = bitmap + [shouldClearDisplay] # append bitmap list and shouldClearDisplay bit
+    data = [1] + bitmap + [shouldClearDisplay] # append bitmap list and shouldClearDisplay bit
     # serialWrite128as64(destination, data)
     destination.write(data)
     time.sleep(timeout)
