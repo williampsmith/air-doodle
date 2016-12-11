@@ -3,16 +3,18 @@
 #include <limits>
 #include <vector>
 #include <algorithm>
+#include <fstream>
 #include <string.h>
 #include <errno.h>
-#include <fstream>
-#include <stdint.h>
 
-// Sensor Lib
-#include "I2Cdev.h"
-#include "MPU6050.h"
+// BNO055 Sesnor Libs
+#include "Adafruit_BNO055_Pi.h"
 
-// Interrupt lib
+// MPU6050 Sensor Libs
+//#include "I2Cdev.h"
+//#include "MPU6050.h"
+
+// Button lib
 #include <wiringPi.h>
 
 #define BUTTON0_PIN 0
@@ -20,7 +22,7 @@
 int main(int argc, char* argv[]) {
 	// Get data collection
 	const char* let = argv[1];
-	int samp = strlen(let);
+	int numSamps = strtol(argv[2], NULL, 10);
 
 	// Setup file
 	std::ofstream ofs;
@@ -36,7 +38,7 @@ int main(int argc, char* argv[]) {
 	pinMode(BUTTON0_PIN, INPUT);
 
 	// Setup Data collection on MPU6050 sensor
-	BNO055 bno055;
+	Adafruit_BNO055 bno055;
  	bno055 = Adafruit_BNO055(-1, BNO055_ADDRESS, I2C_PI, false);
  	while (!bno055.begin()) {
 		std::cout << "Oops, no sensor connected ... Check your wiring or ADDR!\n";
@@ -47,9 +49,9 @@ int main(int argc, char* argv[]) {
 	std::vector<double> vo;
 	std::vector<double> va;
 	int curr = 0;
-	for (int num = 0; num < samp; num++) {
-		int samps = 0;
-		while (samps < 2) {
+	for (int num = 0; num < strlen(let); num++) {
+		int curr = 0;
+		while (curr < numSamps) {
 			if (digitalRead(BUTTON0_PIN) == 1) {
 				std::cout << "Prepare to write: " << let[num] << "\n";
 				ofs << "%" << let[num] << "\n";
@@ -62,7 +64,7 @@ int main(int argc, char* argv[]) {
 					delay(50);
 				}
 				ofs << "\n";
-				samps = samps + 1;
+				curr = curr + 1;
 			}
 			delay(100);
 		}
@@ -81,9 +83,9 @@ int main(int argc, char* argv[]) {
 
 	// int16_t ax, ay, az, gx, gy, gz = 0;
 	// int curr = 0;
-	// for (int num = 0; num < samp; num++) {
-	// 	int samps = 0;
-	// 	while (samps < 2) {
+	// for (int num = 0; num < strlen(let); num++) {
+	// 	int curr = 0;
+	// 	while (curr < numSamps) {
 	// 		if (digitalRead(BUTTON0_PIN) == 1) {
 	// 			std::cout << "Prepare to write: " << let[num] << "\n";
 	// 			ofs << "%" << let[num] << "\n";
@@ -95,7 +97,7 @@ int main(int argc, char* argv[]) {
 	// 				delay(50);
 	// 			}
 	// 			ofs << "\n";
-	// 			samps = samps + 1;
+	// 			curr = curr + 1;
 	// 		}
 	// 		delay(100);
 	// 	}

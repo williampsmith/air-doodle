@@ -26,6 +26,8 @@
 #include <vector>
 #include <unistd.h>
 #include <string.h>
+#include <stdint.h>
+#include <errno.h>
 #include <termios.h>
 #include <time.h>
 #include <fcntl.h>

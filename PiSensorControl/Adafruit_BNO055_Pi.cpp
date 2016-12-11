@@ -51,26 +51,26 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode) {
     struct termios uart_config;
     ret = tcgetattr(fd, &uart_config);
     if (ret < 0) {
-      printf("failed to get attr.\n");
+      std::cout << "Failed to get attr.\n";
       return false;
     }
 
     uart_config.c_oflag &= ~ONLCR;
     ret = cfsetispeed(&uart_config, B38400);
     if (ret < 0) {
-      printf("failed to set input speed.\n");
+      std::cout << "Failed to set input speed.\n";
       return false;
     }
 
     ret = cfsetospeed(&uart_config, B38400);
     if (ret < 0) {
-      printf("failed to set output speed.\n");
+      std::cout << "Failed to set output speed.\n";
       return false;
     }
 
     ret = tcsetattr(fd, TCSANOW, &uart_config);
     if (ret < 0) {
-      printf("failed to set attr.\n");
+      std::cout << "Failed to set attr.\n";
       return false;
     }
   } else {
