@@ -1,0 +1,4 @@
+#!/bin/sh -e
+
+# Buildfile for AirDoodle on Raspberry Pi
+g++ -std=c++11 -pthread I2Cdev.cpp MPU6050.cpp AirDoodle.cpp -o AirDoodle -lbcm2835 -lwiringPi -lbluetooth -lgrt -lm
