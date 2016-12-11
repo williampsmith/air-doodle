@@ -26,6 +26,7 @@ int main(int argc, char* argv[]) {
 
 	// Setup file
 	std::ofstream ofs;
+        ofs.rdbuf()->pubsetbuf(0, 0);
 	ofs.open("testData.txt", std::ofstream::out | std::ofstream::app);
 
 	// Setup wiringPi
