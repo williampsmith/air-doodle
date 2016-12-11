@@ -1,0 +1,4 @@
+#!/bin/sh -e
+
+# Buildfile for DataCollection on Raspberry Pi
+g++ I2Cdev.cpp MPU6050.cpp DataCollection.cpp -o DataCollection -lwiringPi

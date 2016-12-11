@@ -93,17 +93,17 @@ void logInput() {
 	double move = 2;
 
 	// Read new data until movemnet stops
+	int16_t ax, ay, az, gx, gy, gz;
 	while (move > 1.1) {
-//		accel = bno055.getVector(bno055.VECTOR_ACCELEROMETER);
-//		gyro = bno055.getVector(bno055.VECTOR_GYROSCOPE);
-		input_vector[0] = (float) gyro[0];
-		input_vector[1] = (float) gyro[1];
-		input_vector[2] = (float) gyro[2];
-		input_vector[3] = (float) accel[0];
-		input_vector[4] = (float) accel[1];
-		input_vector[5] = (float) accel[2];
+		mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+		input_vector[0] = (float) ax;
+		input_vector[1] = (float) ay;
+		input_vector[2] = (float) az;
+		input_vector[3] = (float) gx;
+		input_vector[4] = (float) gy;
+		input_vector[5] = (float) gz;
 		input_matrix.push_back(input_vector);
-		move = std::sqrt(accel[0]*accel[0] + accel[1]*accel[1] + accel[2]*accel[2]);
+		move = (double) std::sqrt(ax*ax + ay*ay + az*az);
 	}
 
 	// Create structs for new thread
@@ -126,12 +126,6 @@ void logInput() {
 // ---------- MAIN FUNCTION -----------
 
 int main(int argc, char **argv) {
-//	if (argc < 2) {
-//		std::cout << "Using default server bluetooth address!";
-//	} else {
-//		SERVER_BADDR_CHAR = argv[1]
-//	}
-
 	// Setup wiringPi
 	if (wiringPiSetup() < 0) {
 		std::cout << "Unable to setup wiringPi: " << strerror(errno) << "\n";
@@ -142,7 +136,6 @@ int main(int argc, char **argv) {
   	pinMode(BUTTON1_PIN, INPUT);
 
   	// Setup sensor
-//  	I2Cdev::initialize();
   	mpu6050 = MPU6050();
 	mpu6050.initialize();
   	while (!mpu6050.testConnection()) {
@@ -152,13 +145,13 @@ int main(int argc, char **argv) {
 	}
 
 	// Test code for sensor
-	int16_t ax, ay, az, gx, gy, gz = 0;
-	while (true) {
-		mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-		std::cout << ax << "\t" << ay << "\t" << az << "\t" << gx << "\t" << gy << "\t" << gz << "\n";
-    	fflush(stdout);
-    	delay(100);
-	}
+	// int16_t ax, ay, az, gx, gy, gz = 0;
+	// while (true) {
+	// 	mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+	// 	std::cout << ax << "\t" << ay << "\t" << az << "\t" << gx << "\t" << gy << "\t" << gz << "\n";
+ 	//  fflush(stdout);
+ 	//  delay(100);
+	// }
 
     // Setup and connect via bluetooth to display unit
 	blue_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);

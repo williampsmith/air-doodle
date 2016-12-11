@@ -23,10 +23,10 @@
 #include "I2Cdev.h"
 #include "MPU6050.h"
 
-// Interrupt lib
+// Interrupt/Button lib
 #include <wiringPi.h>
 
-// Classification Lib
+// Classification lib
 #include <GRT/GRT.h>
 
 
