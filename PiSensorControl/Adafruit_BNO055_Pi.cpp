@@ -85,8 +85,8 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode) {
 
     if (ioctl(fd, I2C_SLAVE, _address) < 0) {
         std::cout << "Failed to select device: " << strerror(errno) << "\n";
-        close(fd)
-        return FALSE;
+        close(fd);
+        return false;
     }
   }
 
@@ -350,7 +350,7 @@ bool Adafruit_BNO055::getEvent(sensors_event_t *event) {
   event->version   = sizeof(sensors_event_t);
   event->sensor_id = _sensorID;
   event->type      = SENSOR_TYPE_ORIENTATION;
-  event->timestamp = millis();
+  event->timestamp = clock();
 
   // Get a Euler angle sample for orientation
   std::vector<double> euler = getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -489,8 +489,13 @@ bool Adafruit_BNO055::isFullyCalibrated(void) {
 
 // PRIVATE FUNCTIONS //
 
+// Sleep for ms long (in milliseconds)
+void Adafruit_BNO055::delay(unsigned long ms) {
+  usleep(ms*1000);
+}
+
 // Writes an 8 bit value over I2C (uart for Pi)
-bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, byte value) {
+bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, uint8_t value) {
   if (!_isPi) {
     fd = open(_device, O_RDWR);
     while (fd < 0) {
@@ -502,13 +507,16 @@ bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, byte value) {
 
     if (ioctl(fd, I2C_SLAVE, _address) < 0) {
         std::cout << "Failed to select device: " << strerror(errno) << "\n";
-        close(fd)
+        close(fd);
         return false;
     }
   }
 
-  buf[0] = regAddr;
-  memcpy(buf+1,data,1);
+  uint8_t buf[2];
+  buf[0] = reg;
+  buf[1] = value;
+
+  int count = -1;
   count = write(fd, buf, 2);
   if (count < 0) {
       std::cout << "Failed to write device " << count << ": " << ::strerror(errno) << "\n";
@@ -516,8 +524,8 @@ bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, byte value) {
         close(fd);
       }
       return false;
-  } else if (count != length+1) {
-      std::cout << "Short write  from device, expected " << len+1 << ", got " << count << "\n";
+  } else if (count != 2) {
+      std::cout << "Short write  from device, expected " << 2 << ", got " << count << "\n";
       if (!_isPi) {
         close(fd);
       }
@@ -528,14 +536,14 @@ bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, byte value) {
 }
 
 // Reads an 8 bit value over I2C (uart for Pi)
-byte Adafruit_BNO055::read8(adafruit_bno055_reg_t reg ) {
-  byte value[1];
-  readBytes(reg, value, 1)
-  return value;
+uint8_t Adafruit_BNO055::read8(adafruit_bno055_reg_t reg ) {
+  uint8_t value[1];
+  readLen(reg, value, 1);
+  return value[0];
 }
 
 // Reads the specified number of bytes over I2C (uart for Pi)
-bool Adafruit_BNO055::readLen(adafruit_bno055_reg_t reg, byte * buffer, uint8_t len) {
+bool Adafruit_BNO055::readLen(adafruit_bno055_reg_t reg, uint8_t* buffer, uint8_t len) {
   if (!_isPi) {
     fd = open(_device, O_RDWR);
     while (fd < 0) {

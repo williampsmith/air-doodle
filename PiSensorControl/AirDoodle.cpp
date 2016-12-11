@@ -91,19 +91,19 @@ void logInput() {
 	double move = 2;
 
 	// Read BNO055 data until movemnet stops
-	sensors_event_t* orient;
+	std::vector<double> orient;
 	std::vector<double> accel;
 	while (move > 1.1) {
-		bno055.getEvent(&orient);
+		orient = bno055.getVector(bno055.VECTOR_EULER);
 		accel = bno055.getVector(bno055.VECTOR_LINEARACCEL);
-		input_vector[0] = (float) orient.x;
-		input_vector[1] = (float) orient.y;
-		input_vector[2] = (float) orient.z;
+		input_vector[0] = (float) orient[0];
+		input_vector[1] = (float) orient[1];
+		input_vector[2] = (float) orient[2];
 		input_vector[3] = (float) accel[0];
 		input_vector[4] = (float) accel[1];
 		input_vector[5] = (float) accel[2];
 		input_matrix.push_back(input_vector);
-		move = std::sqrt(orient.x*orient.x + orient.y*orient.y + orient.z*orient.z);
+		move = std::sqrt(accel[0]*accel[0] + accel[1]*accel[1] + accel[2]*accel[2]);
 	}
 
 	// Read MPU6050 data until movemnet stops
@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
   	pinMode(BUTTON1_PIN, INPUT);
 
   	// Setup BNO055 sensor
- 	bno055 = Adafruit_BNO055(device=bno055.I2C_PI, isPi=false);
+ 	bno055 = Adafruit_BNO055(-1, BNO055_ADDRESS, I2C_PI, false);
  	while (!bno055.begin()) {
 		std::cout << "Oops, no sensor connected ... Check your wiring or I2C ADDR!\n";
 		delay(500);
@@ -158,12 +158,12 @@ int main(int argc, char **argv) {
 	}
 
 	// Test code for BNO055 sensor
-	sensors_event_t* to;
+	std::vector<double> to;
 	std::vector<double> ta;
 	while (true) {
-		bno055.getEvent(to);
+		to = bno055.getVector(bno055.VECTOR_EULER);
 		ta = bno055.getVector(bno055.VECTOR_LINEARACCEL);
-		std::cout << to.x << "\t" << to.y << "\t" << to.z << "\t" << ta[0] << "\t" << ta[1] << "\t" << ta[2] << "\n";
+		std::cout << to[0] << "\t" << to[1] << "\t" << to[2] << "\t" << ta[0] << "\t" << ta[1] << "\t" << ta[2] << "\n";
  	 fflush(stdout);
  	 delay(100);
 	}
@@ -258,7 +258,7 @@ int main(int argc, char **argv) {
 	}
 
 	// Close the bluetooth socket
-	close(uart);
+	close(blue_sock);
 
 	// Exit
 	return EXIT_SUCCESS;

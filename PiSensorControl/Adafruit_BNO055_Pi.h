@@ -24,9 +24,14 @@
 #include <iostream>
 #include <limits>
 #include <vector>
-#include <stdint.h>
+#include <unistd.h>
 #include <string.h>
 #include <termios.h>
+#include <time.h>
+#include <linux/i2c-dev.h>
+#include <fcntl.h>
+//#include <sys/types.h>
+//#include <sys/stat.h>
 
 //#include <wiringPi.h>
 
@@ -35,7 +40,7 @@
 #define BNO055_ADDRESS  0x28
 #define BNO055_ID       0xA0
 
-// Different connections on RPi (Pi 3 is default)
+// Different connections on RPi (UART on Pi 3 is default)
 #define I2C_PI "/dev/i2c-1"
 #define UART_PI2 "/dev/ttyAMA0"
 #define UART_PI3 "/dev/ttyS0"
@@ -297,6 +302,7 @@ class Adafruit_BNO055 : public Adafruit_Sensor {
     bool  isFullyCalibrated(void);
 
   private:
+    void delay ( unsigned long ms );
     uint8_t  read8   ( adafruit_bno055_reg_t );
     bool  readLen ( adafruit_bno055_reg_t, uint8_t* buffer, uint8_t len );
     bool  write8  ( adafruit_bno055_reg_t, uint8_t value );
