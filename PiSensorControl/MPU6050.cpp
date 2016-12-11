@@ -2383,7 +2383,7 @@ bool MPU6050::getSleepEnabled() {
  * @see MPU6050_PWR1_SLEEP_BIT
  */
 void MPU6050::setSleepEnabled(bool enabled) {
-    I2Cdev::writeBit(devAddr, MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, enabled);
+    I2Cdev::writeBit(devAddr, MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, 0);
 }
 /** Get wake cycle enabled status.
  * When this bit is set to 1 and SLEEP is disabled, the MPU-60X0 will cycle
