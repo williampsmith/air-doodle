@@ -18,9 +18,9 @@ def writeToSerial(destination, bitmap, shouldClearDisplay = 1, timeout = 0.04):
     destination.write(data)
     time.sleep(timeout)
 
-arduino = serial.Serial(port='/dev/cu.usbmodem1411', baudrate=115200, timeout=0.1)
+arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=0.1)
 time.sleep(1) # give the connection a second to settle
-arduino.setDTR(level=0)
+arduino.setDTR(0)
 time.sleep(1)
 
 # display bitmap. Will eventually come from ded reckoning algorithm
