@@ -166,7 +166,7 @@ int main(int argc, char **argv) {
 		va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
 		std::cout << vo[0] << "\t" << vo[1] << "\t" << vo[2] << "\t" << va[0] << "\t" << va[1] << "\t" << va[2] << "\n";
  	 	fflush(stdout);
- 	 	delay(100);
+ 	 	delay(10);
 	}
 
   	// Setup MPU6050 sensor
