@@ -88,23 +88,37 @@ void* analyze(void* args) {
 void logInput() {
 	GRT::MatrixFloat input_matrix;
 	GRT::VectorFloat input_vector(6);
-	std::vector<double> accel;
-	std::vector<double> gyro;
 	double move = 2;
 
-	// Read new data until movemnet stops
-	int16_t ax, ay, az, gx, gy, gz;
+	// Read BNO055 data until movemnet stops
+	sensors_event_t* orient;
+	std::vector<double> accel;
 	while (move > 1.1) {
-		mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-		input_vector[0] = (float) ax;
-		input_vector[1] = (float) ay;
-		input_vector[2] = (float) az;
-		input_vector[3] = (float) gx;
-		input_vector[4] = (float) gy;
-		input_vector[5] = (float) gz;
+		bno055.getEvent(&orient);
+		accel = bno055.getVector(bno055.VECTOR_LINEARACCEL);
+		input_vector[0] = (float) orient.x;
+		input_vector[1] = (float) orient.y;
+		input_vector[2] = (float) orient.z;
+		input_vector[3] = (float) accel[0];
+		input_vector[4] = (float) accel[1];
+		input_vector[5] = (float) accel[2];
 		input_matrix.push_back(input_vector);
-		move = (double) std::sqrt(ax*ax + ay*ay + az*az);
+		move = std::sqrt(orient.x*orient.x + orient.y*orient.y + orient.z*orient.z);
 	}
+
+	// Read MPU6050 data until movemnet stops
+	// int16_t ax, ay, az, gx, gy, gz;
+	// while (move > 1.1) {
+	// 	mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+	// 	input_vector[0] = (float) ax;
+	// 	input_vector[1] = (float) ay;
+	// 	input_vector[2] = (float) az;
+	// 	input_vector[3] = (float) gx;
+	// 	input_vector[4] = (float) gy;
+	// 	input_vector[5] = (float) gz;
+	// 	input_matrix.push_back(input_vector);
+	// 	move = (double) std::sqrt(ax*ax + ay*ay + az*az);
+	// }
 
 	// Create structs for new thread
 	pthread_t pth;
@@ -135,16 +149,35 @@ int main(int argc, char **argv) {
   	// Setup buttons
   	pinMode(BUTTON1_PIN, INPUT);
 
-  	// Setup sensor
-  	mpu6050 = MPU6050();
-	mpu6050.initialize();
-  	while (!mpu6050.testConnection()) {
+  	// Setup BNO055 sensor
+ 	bno055 = Adafruit_BNO055(device=bno055.I2C_PI, isPi=false);
+ 	while (!bno055.begin()) {
 		std::cout << "Oops, no sensor connected ... Check your wiring or I2C ADDR!\n";
 		delay(500);
 		std::cout << "Trying Again...\n";
 	}
 
-	// Test code for sensor
+	// Test code for BNO055 sensor
+	sensors_event_t* to;
+	std::vector<double> ta;
+	while (true) {
+		bno055.getEvent(to);
+		ta = bno055.getVector(bno055.VECTOR_LINEARACCEL);
+		std::cout << to.x << "\t" << to.y << "\t" << to.z << "\t" << ta[0] << "\t" << ta[1] << "\t" << ta[2] << "\n";
+ 	 fflush(stdout);
+ 	 delay(100);
+	}
+
+  	// Setup MPU6050 sensor
+ 	//  mpu6050 = MPU6050();
+	// mpu6050.initialize();
+ 	//  while (!mpu6050.testConnection()) {
+	// 	std::cout << "Oops, no sensor connected ... Check your wiring or I2C ADDR!\n";
+	// 	delay(500);
+	// 	std::cout << "Trying Again...\n";
+	// }
+
+	// Test code for MPU6050 sensor
 	// int16_t ax, ay, az, gx, gy, gz = 0;
 	// while (true) {
 	// 	mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
@@ -225,7 +258,7 @@ int main(int argc, char **argv) {
 	}
 
 	// Close the bluetooth socket
-	close(blue_sock);
+	close(uart);
 
 	// Exit
 	return EXIT_SUCCESS;

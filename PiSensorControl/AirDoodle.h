@@ -18,10 +18,12 @@
 #include <bluetooth/bluetooth.h> // Bluetooth dev lib written for Raspberry Pi
 #include <bluetooth/rfcomm.h>  // More dev libs written for Raspberry Pi
 
-// Sensor lib
-//#include <bcm2835.h>
-#include "I2Cdev.h"
-#include "MPU6050.h"
+// BNO055 Sensor lib
+#include "Adafruit_BNO055_Pi.h"
+
+// MPU6050 Sensor lib
+//#include "I2Cdev.h"
+//#include "MPU6050.h"
 
 // Interrupt/Button lib
 #include <wiringPi.h>
@@ -37,8 +39,6 @@
 
 #define SERVER_CHANNEL	1 // Channel for the bluetooth connection
 #define SERVER_BADDR_CHAR "B8:27:EB:DE:90:2A" // Bluetooth MAC address for the edison
-
-#define I2C_BAUD 38400 // Baudrate for i2c (Don't think I use this....)
 
 
 // ---------- FUNCTION DEFINITIONS -----------
@@ -60,8 +60,9 @@ void decrementThreads();	// Decrements number of threads currently running
 int blue_sock, status;
 sockaddr_rc blue_conn = {0};
 
-// BNO055 global variables
-MPU6050 mpu6050;
+// Sensor global variables
+Adafruit_BNO055 bno055;
+//MPU6050 mpu6050;
 
 // Threaded globals
 pthread_mutexattr_t mutex_attr;

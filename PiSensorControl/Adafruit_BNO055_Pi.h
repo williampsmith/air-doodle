@@ -24,19 +24,23 @@
 #include <iostream>
 #include <limits>
 #include <vector>
+#include <stdint.h>
 #include <string.h>
+#include <termios.h>
 
-#include <wiringPi.h>
-#include <wiringPiI2C.h>
+//#include <wiringPi.h>
 
 #include "Adafruit_Sensor_Pi.h"
 
 #define BNO055_ADDRESS  0x28
 #define BNO055_ID       0xA0
 
-#define NUM_BNO055_OFFSET_REGISTERS 22
+// Different connections on RPi (Pi 3 is default)
+#define I2C_PI "/dev/i2c-1"
+#define UART_PI2 "/dev/ttyAMA0"
+#define UART_PI3 "/dev/ttyS0"
 
-typedef uint8_t	byte;
+#define NUM_BNO055_OFFSET_REGISTERS 22
 
 typedef struct {
     uint16_t accel_offset_x;
@@ -266,7 +270,7 @@ class Adafruit_BNO055 : public Adafruit_Sensor {
       VECTOR_GRAVITY       = BNO055_GRAVITY_DATA_X_LSB_ADDR
     } adafruit_vector_type_t;
 
-    Adafruit_BNO055 ( int32_t sensorID = -1, uint8_t address = BNO055_ADDRESS );
+    Adafruit_BNO055 ( int32_t sensorID = -1, uint8_t address = BNO055_ADDRESS, const char* device = UART_PI3, bool isPi = true );
     bool  begin               ( adafruit_bno055_opmode_t mode = OPERATION_MODE_NDOF );
     void  setMode             ( adafruit_bno055_opmode_t mode );
     void  getRevInfo          ( adafruit_bno055_rev_info_t* );
@@ -293,12 +297,14 @@ class Adafruit_BNO055 : public Adafruit_Sensor {
     bool  isFullyCalibrated(void);
 
   private:
-    byte  read8   ( adafruit_bno055_reg_t );
-    bool  readLen ( adafruit_bno055_reg_t, byte* buffer, uint8_t len );
-    bool  write8  ( adafruit_bno055_reg_t, byte value );
+    uint8_t  read8   ( adafruit_bno055_reg_t );
+    bool  readLen ( adafruit_bno055_reg_t, uint8_t* buffer, uint8_t len );
+    bool  write8  ( adafruit_bno055_reg_t, uint8_t value );
 
     int _address;
     int _sensorID;
-    int i2c;
+    const char* _device; // for uart connection
+    int fd;
+    bool _isPi;
     adafruit_bno055_opmode_t _mode;
 };
