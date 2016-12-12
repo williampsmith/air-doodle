@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
 
 	// Setup wiringPi
 	if (wiringPiSetup() < 0) {
-		std::cout << "Unable to setup wiringPi: " << strerror(errno) << "\n";
+		std::cout << "Unable to setup wiringPi: " << strerror(errno) << endl;
 		return EXIT_FAILURE;
   	}
 
@@ -54,17 +54,17 @@ int main(int argc, char* argv[]) {
 		int curr = 0;
 		while (curr < numSamps) {
 			if (digitalRead(BUTTON0_PIN) == 1) {
-				std::cout << "Prepare to write: " << let[num] << "\n";
-				ofs << "%" << let[num] << "\n";
+				std::cout << "Prepare to write: " << let[num] << endl;
+				ofs << "%" << let[num] << endl;
 				delay(3000);
 				while (digitalRead(BUTTON0_PIN) == 1) {
 					vo = bno055.getVector(bno055.VECTOR_EULER);
 					va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
-					std::cout << vo[0] << "\t" << vo[1] << "\t" << vo[2] << "\t" << va[0] << "\t" << va[1] << "\t" << va[2] << "\n";
-					ofs << vo[0] << " " << vo[1] << " " << vo[2] << " " << va[0] << " " << va[1] << " " << va[2] << "\n";
+					std::cout << vo[0] << "\t" << vo[1] << "\t" << vo[2] << "\t" << va[0] << "\t" << va[1] << "\t" << va[2] << endl;
+					ofs << vo[0] << " " << vo[1] << " " << vo[2] << " " << va[0] << " " << va[1] << " " << va[2] << endl;
 					delay(50);
 				}
-				ofs << "\n";
+				ofs << endl;
 				curr = curr + 1;
 			}
 			delay(100);
@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
 	// 	delay(500);
 	// 	std::cout << "Trying Again...\n";
 	// }
-	// std::cout << mpu6050.getRate() << "\n";
+	// std::cout << mpu6050.getRate() << endl;
 
 	// int16_t ax, ay, az, gx, gy, gz = 0;
 	// int curr = 0;
@@ -88,16 +88,16 @@ int main(int argc, char* argv[]) {
 	// 	int curr = 0;
 	// 	while (curr < numSamps) {
 	// 		if (digitalRead(BUTTON0_PIN) == 1) {
-	// 			std::cout << "Prepare to write: " << let[num] << "\n";
-	// 			ofs << "%" << let[num] << "\n";
+	// 			std::cout << "Prepare to write: " << let[num] << endl;
+	// 			ofs << "%" << let[num] << endl;
 	// 			delay(3000);
 	// 			while (digitalRead(BUTTON0_PIN) == 1) {
 	// 				mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-	// 				std::cout << ax << "\t" << ay << "\t" << az << "\t" << gx << "\t" << gy << "\t" << gz << "\n";
-	// 				ofs << ax << " " << ay << " " << az << " " << gx << " " << gy << " " << gz << "\n";
+	// 				std::cout << ax << "\t" << ay << "\t" << az << "\t" << gx << "\t" << gy << "\t" << gz << endl;
+	// 				ofs << ax << " " << ay << " " << az << " " << gx << " " << gy << " " << gz << endl;
 	// 				delay(50);
 	// 			}
-	// 			ofs << "\n";
+	// 			ofs << endl;
 	// 			curr = curr + 1;
 	// 		}
 	// 		delay(100);
