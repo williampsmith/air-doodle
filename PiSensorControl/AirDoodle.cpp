@@ -155,13 +155,13 @@ void logInput() {
 	// }
 
 	// Create structs for new thread
-//	pthread_t pth;
-//	thread_arg_struct* inputs;
-//	inputs->threadNum = nThread;
-//	inputs->matrix = input_matrix;
+	pthread_t pth;
+	thread_arg_struct* inputs = new thread_arg_struct;
+	inputs->threadNum = nThread;
+	inputs->matrix = input_matrix;
 
 	// Split off into new thread for analysis
-//	pthread_create(&pth, &thread_attr, &analyze, &inputs);
+	pthread_create(&pth, &thread_attr, &analyze, (void *) &inputs);
 
 	// Increment thread counts
 	pthread_mutex_lock(&threads);
