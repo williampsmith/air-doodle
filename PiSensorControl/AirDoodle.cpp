@@ -62,7 +62,7 @@ void* analyze(void* args) {
 
 	//Setup a custom recognition pipeline
   	GRT::GestureRecognitionPipeline pipeline;
-  	if (!pipeline.load("DTW_Pipeline_Model.txt")) {
+  	if (!pipeline.load("Pi_DTW_Pipeline_Model.txt")) {
   		std::cout << "Failed to load the classifier model" << endl;
 		decrementThreads();
   		return NULL;
@@ -86,8 +86,8 @@ void* analyze(void* args) {
 
 // Logging function
 void logInput() {
-	GRT::MatrixFloat input_matrix;
-	GRT::VectorFloat input_vector(6);
+	GRT::MatrixDouble input_matrix;
+	GRT::VectorDouble input_vector(5);
 	double move = 2;
 
 	// Read BNO055 data until movemnet stops
@@ -96,12 +96,12 @@ void logInput() {
 	while (move > 1.1) {
 		vo = bno055.getVector(bno055.VECTOR_EULER);
 		va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
-		input_vector[0] = (float) vo[0];
-		input_vector[1] = (float) vo[1];
-		input_vector[2] = (float) vo[2];
-		input_vector[3] = (float) va[0];
-		input_vector[4] = (float) va[1];
-		input_vector[5] = (float) va[2];
+		//input_vector[0] = (float) vo[0]; // REMOVE BAD FOR CLASS
+		input_vector[0] = vo[1];
+		input_vector[1] = vo[2];
+		input_vector[2] = va[0];
+		input_vector[3] = va[1];
+		input_vector[4] = va[2];
 		input_matrix.push_back(input_vector);
 		move = std::sqrt(va[0]*va[0] + va[1]*va[1] + va[2]*va[2]);
 	}

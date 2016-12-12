@@ -74,5 +74,5 @@ uint8_t aliveThreads = 0;
 uint8_t nThread = 0;
 typedef struct {
 	uint8_t threadNum;
-	GRT::MatrixFloat matrix;
+	GRT::MatrixDouble matrix;
 } thread_arg_struct;
