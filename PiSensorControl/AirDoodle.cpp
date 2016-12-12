@@ -68,7 +68,7 @@ void* analyze(void* args) {
 
 	//Setup a custom recognition pipeline
   	GRT::GestureRecognitionPipeline pipeline;
-  	if (!pipeline.load("Pi2_DTW_Pipeline_Model.txt")) {
+  	if (!pipeline.load("Pi3_DTW_Pipeline_Model.txt")) {
   		std::cout << "Failed to load the classifier model" << std::endl;
 		decrementThreads();
   		return NULL;
@@ -113,15 +113,15 @@ void logInput() {
 		input_vector[4] = va[2];
 		input_matrix.push_back(input_vector);
 		move = std::sqrt(va[0]*va[0] + va[1]*va[1] + va[2]*va[2]);
+		std::cout << vo[1] << " " << vo[2] << " " << va[0] << " " << va[1] << " " << va[2] << std::endl;
 		std::cout << input_vector[0] << " " << input_vector[1] << " " << input_vector[2] << " " << input_vector[3] << " " << input_vector[4] << std::endl;
-		std::cout << vo[0] << " " << vo[1] << " " << vo[2] << " " << va[0] << " " << va[1] << " " << va[2] << std::endl;
 		std::cout << std::endl;
 		delay(50);
 	}
 
 	//Setup a custom recognition pipeline
   	GRT::GestureRecognitionPipeline pipeline;
-  	if (!pipeline.load("Pi2_DTW_Pipeline_Model.txt")) {
+  	if (!pipeline.load("Pi3_DTW_Pipeline_Model.txt")) {
   		std::cout << "Failed to load the classifier model" << std::endl;
 		decrementThreads();
   	}
@@ -133,8 +133,8 @@ void logInput() {
 	}
 	std::cout << "Before Class" << std::endl;
 	uint8_t gesture = pipeline.getPredictedClassLabel();
-	std::cout << "After Class" << std::endl;
 	std::cout << gesture << std::endl;
+	std::cout << "After Class" << std::endl;
 
 	// Send threadNum and recognized gesture to bluetooth function
 	send(nThread, gesture);
