@@ -134,9 +134,9 @@ void logInput() {
 
 	// Create structs for new thread
 	pthread_t pth;
-	thread_arg_struct inputs;
-	inputs.threadNum = nThread;
-	inputs.matrix = input_matrix;
+	thread_arg_struct* inputs;
+	inputs->threadNum = nThread;
+	inputs->matrix = input_matrix;
 
 	// Split off into new thread for analysis
 	pthread_create(&pth, &thread_attr, &analyze, &inputs);
@@ -243,7 +243,7 @@ int main(int argc, char **argv) {
   	}
 
   	for (;;) {
-  		if (digitalRead(BUTTON1_PIN) == 1) {
+  		if (false) { //digitalRead(BUTTON1_PIN) == 1) {
   			break;
   		} else {
   			delay(50);
