@@ -68,7 +68,7 @@ void* analyze(void* args) {
 
 	//Setup a custom recognition pipeline
   	GRT::GestureRecognitionPipeline pipeline;
-  	if (!pipeline.load("Pi_DTW_Pipeline_Model.txt")) {
+  	if (!pipeline.load("Pi2_DTW_Pipeline_Model.txt")) {
   		std::cout << "Failed to load the classifier model" << std::endl;
 		decrementThreads();
   		return NULL;
@@ -131,9 +131,9 @@ void logInput() {
 		std::cout << "Failed to perform prediction for thread " << nThread << std::endl;
 		decrementThreads();
 	}
-	std::cout << "Before Class" << std.endl;
+	std::cout << "Before Class" << std::endl;
 	uint8_t gesture = pipeline.getPredictedClassLabel();
-	std::cout << "After Class" << std.endl;
+	std::cout << "After Class" << std::endl;
 	std::cout << gesture << std::endl;
 
 	// Send threadNum and recognized gesture to bluetooth function
