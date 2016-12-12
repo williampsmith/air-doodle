@@ -1,5 +1,6 @@
 /*
- * Created by Mitchell Oleson for EECS149 AirDoodle Projectpthread_mutex_lock(&threads)
+ * Created by Mitchell Oleson for EECS149 AirDoodle Project
+ * pthread_mutex_lock(&threads)
  */
 
 #include "AirDoodle.h"
