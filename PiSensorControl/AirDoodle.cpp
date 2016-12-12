@@ -60,6 +60,11 @@ void decrementThreads() {
 void* analyze(void* args) {
 	thread_arg_struct* inputs = (thread_arg_struct*) args;
 
+	std::cout << "Size: " << inputs->matrix.getSize() << std::endl;
+	std::cout << "Rows: " << inputs->matrix.getNumRows() << std::endl;
+	std::cout << "Cols: " << inputs->matrix.getNumCols() << std::endl;
+
+
 	//Setup a custom recognition pipeline
   	GRT::GestureRecognitionPipeline pipeline;
   	if (!pipeline.load("Pi_DTW_Pipeline_Model.txt")) {
@@ -70,7 +75,7 @@ void* analyze(void* args) {
 
 	// Predict gesture using the classifier
 	if (!pipeline.predict(inputs->matrix)) {
-		std::cout << "Failed to perform prediction for thread " << inputs->threadNum << std::endl;
+		std::cout << "Failed to perform prediction for thread " << inputs->threadNum << inputs->threadNum << std::endl;
 		decrementThreads();
 		return NULL;
 	}
@@ -86,6 +91,9 @@ void* analyze(void* args) {
 
 // Logging function
 void logInput() {
+	std::cout << "Entered logInput" << std::endl;
+	delay(500);
+
 	GRT::MatrixDouble input_matrix;
 	GRT::VectorDouble input_vector(5);
 	double move = 2;
@@ -93,7 +101,7 @@ void logInput() {
 	// Read BNO055 data until movemnet stops
 	std::vector<double> vo;
 	std::vector<double> va;
-	while (move > 1.1) {
+	while (move > 0.2) {
 		vo = bno055.getVector(bno055.VECTOR_EULER);
 		va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
 		//input_vector[0] = (float) vo[0]; // REMOVE BAD FOR CLASS
@@ -104,6 +112,10 @@ void logInput() {
 		input_vector[4] = va[2];
 		input_matrix.push_back(input_vector);
 		move = std::sqrt(va[0]*va[0] + va[1]*va[1] + va[2]*va[2]);
+		std::cout << input_vector[0] << " " << input_vector[1] << " " << input_vector[2] << " " << input_vector[3] << " " << input_vector[4] << std::endl;
+		std::cout << vo[0] << " " << vo[1] << " " << vo[2] << " " << va[0] << " " << va[1] << " " << va[2] << std::endl;
+		std::cout << std::endl;
+		delay(50);
 	}
 
 	// Read MPU6050 data until movemnet stops
@@ -192,10 +204,10 @@ int main(int argc, char **argv) {
 	blue_conn.rc_family = AF_BLUETOOTH;
 	blue_conn.rc_channel = (uint8_t) SERVER_CHANNEL;
 	str2ba(SERVER_BADDR_CHAR, &blue_conn.rc_bdaddr);
-	status = connect(blue_sock, (struct sockaddr *) &blue_conn, sizeof(blue_conn));
-	if (status < 0) {
-		std::cout << "Error connecting to server" << std::endl;
-		return EXIT_FAILURE;
+	while (connect(blue_sock, (struct sockaddr *) &blue_conn, sizeof(blue_conn)) < 0) {
+		std::cout << "Error connecting to server... ";
+		delay(500);
+		std::cout << "Trying again..." << std::endl;
 	}
 
 	// Setup threaded environment & mutexes

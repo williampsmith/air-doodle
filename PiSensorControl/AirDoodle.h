@@ -38,7 +38,7 @@
 #define BUTTON1_PIN 1 // Button to exit
 
 #define SERVER_CHANNEL	1 // Channel for the bluetooth connection
-#define SERVER_BADDR_CHAR "B8:27:EB:DE:90:2A" // Bluetooth MAC address for the edison
+#define SERVER_BADDR_CHAR "B8:27:EB:A1:D8:3F" // Bluetooth MAC address for the edison
 
 
 // ---------- FUNCTION DEFINITIONS -----------
@@ -58,7 +58,7 @@ void decrementThreads();	// Decrements number of threads currently running
 
 // Bluetooth global variables
 int blue_sock, status;
-sockaddr_rc blue_conn = {0};
+struct sockaddr_rc blue_conn = {0};
 
 // Sensor global variables
 Adafruit_BNO055 bno055;
