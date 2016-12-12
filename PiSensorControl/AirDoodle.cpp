@@ -96,17 +96,20 @@ void *analyze(void* args) {
 // Logging function
 void logInput() {
 	std::cout << "Entered logInput" << std::endl;
-	delay(500);
+	//delay(500);
 
 	GRT::VectorDouble input_vector(5);
 	thread_arg_struct* inputs = new thread_arg_struct;
 	inputs->threadNum = nThread;
-	double move = 2;
+
+	//std::cout << "Collecting Data..." << std::endl;
 
 	// Read BNO055 data until second button press
 	std::vector<double> vo;
 	std::vector<double> va;
-	while (millis()-start < 2000) {
+	digitalWrite(BUTTON1_PIN, HIGH);
+//  	pinMode(BUTTON0_PIN, INPUT);
+	while (digitalRead(BUTTON0_PIN) != LOW) {
 		vo = bno055.getVector(bno055.VECTOR_EULER);
 		va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
 		//input_vector[0] = (float) vo[0]; // REMOVE: THROUGHS OFF CLASSIFICATION
@@ -121,6 +124,7 @@ void logInput() {
 		//std::cout << std::endl;
 		delay(50);
 	}
+	digitalWrite(BUTTON1_PIN, LOW);
 
 	// Read MPU6050 data until second button press
 	// int16_t ax, ay, az, gx, gy, gz;
@@ -135,6 +139,8 @@ void logInput() {
 	// 	input_matrix.push_back(input_vector);
 	// }
 
+	//std::cout << "Creating thread..." << std::endl;
+
 	// Create thread struct for split
 	pthread_t pth;
 
@@ -146,6 +152,16 @@ void logInput() {
 	aliveThreads = aliveThreads + 1;
 	nThread = nThread + 1;
 	pthread_mutex_unlock(&threads);
+
+//	while (wiringPiISR(BUTTON0_PIN, INT_EDGE_RISING, &irq_handler) < 0 ) {
+//    		std::cout << "Unable to setup ISR: " << strerror(errno) << " ... ";
+//		delay(500);
+//		std::cout << "Trying again..." << std::endl;
+//	}
+
+
+	std::cout << "Leaving logInput" << std::endl;
+	std::cout << std::endl;
 }
 
 
@@ -159,7 +175,7 @@ int main(int argc, char **argv) {
   	}
 
   	// Setup buttons
-  	pinMode(BUTTON1_PIN, INPUT);
+  	pinMode(BUTTON1_PIN, OUTPUT);
 
   	// Setup BNO055 sensor
  	bno055 = Adafruit_BNO055(-1, BNO055_ADDRESS, I2C_PI, false);
@@ -237,9 +253,10 @@ int main(int argc, char **argv) {
 	}
 
 	// Setup interrupts
-	if (wiringPiISR(BUTTON0_PIN, INT_EDGE_FALLING, &irq_handler) < 0 ) {
-    	std::cout << "Unable to setup ISR: " << strerror(errno) << std::endl;
-      	return EXIT_FAILURE;
+	while (wiringPiISR(BUTTON0_PIN, INT_EDGE_RISING, &irq_handler) < 0 ) {
+    		std::cout << "Unable to setup ISR: " << strerror(errno) << " ... ";
+		delay(500);
+		std::cout << "Trying again..." << std::endl;
   	}
 
   	for (;;) {
