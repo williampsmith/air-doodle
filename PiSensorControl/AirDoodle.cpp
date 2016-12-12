@@ -131,7 +131,9 @@ void logInput() {
 		std::cout << "Failed to perform prediction for thread " << nThread << std::endl;
 		decrementThreads();
 	}
+	std::cout << "Before Class" << std.endl;
 	uint8_t gesture = pipeline.getPredictedClassLabel();
+	std::cout << "After Class" << std.endl;
 	std::cout << gesture << std::endl;
 
 	// Send threadNum and recognized gesture to bluetooth function
@@ -218,7 +220,7 @@ int main(int argc, char **argv) {
  	//  delay(100);
 	// }
 
-        // Setup and connect via bluetooth to display unit
+    // Setup and connect via bluetooth to display unit
 	blue_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 	blue_conn.rc_family = AF_BLUETOOTH;
 	blue_conn.rc_channel = (uint8_t) SERVER_CHANNEL;
