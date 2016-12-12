@@ -8,7 +8,7 @@ int main(int argc, const char * argv[])
   GestureRecognitionPipeline pipeline;
 
   //Add a low pass filter to the pipeline with a buffer size of 3 samples and dimension 6
-  pipeline << MovingAverageFilter(4, 6);
+  pipeline << MovingAverageFilter(4, 5);
 
   //Add a custom feature extraction algorithm that will use the output of the FFT as input
   // pipeline << MyCustomFeatureAlgorithm();
@@ -20,7 +20,7 @@ int main(int argc, const char * argv[])
 
   //Load a labeled data set from a txt file and train a classification model
   LabelledTimeSeriesClassificationData trainingData;
-  trainingData.load( "piTrainingData.txt" );
+  trainingData.load( "pi2TrainingData.txt" );
 
   //Use 25% of the training dataset to create a test dataset
   LabelledTimeSeriesClassificationData testData = trainingData.split( 75 );
@@ -38,14 +38,14 @@ int main(int argc, const char * argv[])
   }
 
   //Save the pipeline model to a file
-  success = pipeline.save("Pi_DTW_Pipeline_Model.txt");
+  success = pipeline.save("Pi2_DTW_Pipeline_Model.txt");
   if(!success){
       cout << "Failed to save the classifier model!\n";
       return EXIT_FAILURE;
   }
 
   //Load the pipline model from a file
-  success = pipeline.load("DTW_Pipeline_Model.txt");
+  success = pipeline.load("Pi2_DTW_Pipeline_Model.txt");
   if(!success){
       cout << "Failed to load the classifier model!\n";
       return EXIT_FAILURE;

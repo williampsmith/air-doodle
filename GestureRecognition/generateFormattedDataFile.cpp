@@ -11,7 +11,7 @@ int main (int argc, const char * argv[])
     TimeSeriesClassificationData trainingData;
 
     //Set the dimensionality of the data (you need to do this before you can add any samples)
-    trainingData.setNumDimensions( 6 );
+    trainingData.setNumDimensions( /*6*/ 5 );
 
     //You can also give the dataset a name (the name should have no spaces)
     trainingData.setDatasetName("piTrainingData");
@@ -41,22 +41,22 @@ int main (int argc, const char * argv[])
           cout << "Line retrieved: " << line << endl;
           if ((line[0] != '%') && line.length() > 3){ // check for empty lines and delimiter lines
             //cout << "Creating new training sample." << endl;
-            VectorDouble sample( 6 );
+            VectorDouble sample( 5 );
             istringstream iss(line);
             double x_or, y_or, z_or, x_accel, y_accel, z_accel;
 
             // get all the data points from the line
             iss >> x_or >> y_or >> z_or >> x_accel >> y_accel >> z_accel;
             cout << "Sample:" << endl;
-            cout << x_or << "  " << y_or << "  " << z_or << "  " << x_accel << "  " << y_accel << "  " << z_accel << endl;
+            cout /*<< x_or << "  " */ << y_or << "  " << z_or << "  " << x_accel << "  " << y_accel << "  " << z_accel << endl;
 
             // populate the sample vector
-            sample[0] = x_or;
-            sample[1] = y_or;
-            sample[2] = z_or;
-            sample[3] = x_accel;
-            sample[4] = y_accel;
-            sample[5] = z_accel;
+            //sample[0] = x_or;
+            sample[0] = y_or;
+            sample[1] = z_or;
+            sample[2] = x_accel;
+            sample[3] = y_accel;
+            sample[4] = z_accel;
 
             trainingSample.push_back(sample);
             cout << "training sample size: " << trainingSample.getSize() << endl;
@@ -74,7 +74,7 @@ int main (int argc, const char * argv[])
     }
 
     //After recording your training data you can then save it to a file
-    if( !trainingData.saveDatasetToFile( "piTrainingData.txt" ) ){
+    if( !trainingData.saveDatasetToFile( "pi2TrainingData.txt" ) ){
         cout << "Failed to save dataset to file!\n";
         return EXIT_FAILURE;
     }
