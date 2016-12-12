@@ -60,8 +60,10 @@ try:
         if (len(pos) == 0): break
         time.sleep(0.5)
         val = client_sock.recv(1024)
-        print 'Received => Pos: [', int(pos), ' ] Val: [', gestures[int(val)], ' ]'
-        # pos = int(pos)
+        #pos = int(pos)
+        #val = int(val)
+        print 'Received => Pos: [', pos, ' ] Val: [', val, ' ]' #gestures[val]
+        #
         # if pos == curr:
         # 	#arduino.write(val.encode())
         #     #writeCharacter(arduino, 'S')

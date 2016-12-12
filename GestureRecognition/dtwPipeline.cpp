@@ -38,14 +38,14 @@ int main(int argc, const char * argv[])
   }
 
   //Save the pipeline model to a file
-  success = pipeline.save("Pi2_DTW_Pipeline_Model.txt");
+  success = pipeline.save("Pi3_DTW_Pipeline_Model.txt");
   if(!success){
       cout << "Failed to save the classifier model!\n";
       return EXIT_FAILURE;
   }
 
   //Load the pipline model from a file
-  success = pipeline.load("Pi2_DTW_Pipeline_Model.txt");
+  success = pipeline.load("Pi3_DTW_Pipeline_Model.txt");
   if(!success){
       cout << "Failed to load the classifier model!\n";
       return EXIT_FAILURE;
