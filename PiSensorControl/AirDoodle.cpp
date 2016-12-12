@@ -118,6 +118,26 @@ void logInput() {
 		delay(50);
 	}
 
+	//Setup a custom recognition pipeline
+  	GRT::GestureRecognitionPipeline pipeline;
+  	if (!pipeline.load("Pi_DTW_Pipeline_Model.txt")) {
+  		std::cout << "Failed to load the classifier model" << std::endl;
+		decrementThreads();
+  		return NULL;
+  	}
+
+	// Predict gesture using the classifier
+	if (!pipeline.predict(input_matrix)) {
+		std::cout << "Failed to perform prediction for thread " << inputs->threadNum << inputs->threadNum << std::endl;
+		decrementThreads();
+		return NULL;
+	}
+	uint8_t gesture = pipeline.getPredictedClassLabel();
+	std::cout << gesture << std::endl;
+
+	// Send threadNum and recognized gesture to bluetooth function
+	send(nThread, gesture);
+
 	// Read MPU6050 data until movemnet stops
 	// int16_t ax, ay, az, gx, gy, gz;
 	// while (move > 1.1) {
