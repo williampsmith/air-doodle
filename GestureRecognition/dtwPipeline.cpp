@@ -4,35 +4,41 @@ using namespace GRT;
 
 int main(int argc, const char * argv[])
 {
-  //Setup a custom recognition pipeline
+  // //Setup a custom recognition pipeline
   GestureRecognitionPipeline pipeline;
 
   //Add a low pass filter to the pipeline with a buffer size of 3 samples and dimension 6
-  pipeline << MovingAverageFilter(3, 6);
+  pipeline << MovingAverageFilter(4, 6);
 
   //Add a custom feature extraction algorithm that will use the output of the FFT as input
   // pipeline << MyCustomFeatureAlgorithm();
 
   //Add a Dynamic Time Warp Classifier and enable trimming
   DTW dtw;
-  dtw.enableTrimTrainingData(true, 0.1, 90);
+  dtw.enableTrimTrainingData(true, 0.01, 90);
   pipeline << dtw;
 
   //Load a labeled data set from a txt file and train a classification model
   LabelledTimeSeriesClassificationData trainingData;
-  trainingData.load( "TrainingData.txt" );
+  trainingData.load( "piTrainingData.txt" );
 
   //Use 25% of the training dataset to create a test dataset
   LabelledTimeSeriesClassificationData testData = trainingData.split( 75 );
 
+  // // todo: remove. for testing only
+  // LabelledTimeSeriesClassificationData testData;
+  // testData.load( "piTrainingData.txt" );
+
+
   bool success = pipeline.train( trainingData );
+  //bool success;
   if (!success) {
     cout << "Could not train the model." << endl;
     return EXIT_FAILURE;
   }
 
   //Save the pipeline model to a file
-  success = pipeline.save("DTW_Pipeline_Model.txt");
+  success = pipeline.save("Pi_DTW_Pipeline_Model.txt");
   if(!success){
       cout << "Failed to save the classifier model!\n";
       return EXIT_FAILURE;
@@ -56,7 +62,7 @@ int main(int argc, const char * argv[])
 
       //Perform a prediction using the classifier
       if( !pipeline.predict( timeseries ) ){
-          cout << "Failed to perform prediction for test sampel: " << i <<"\n";
+          cout << "Failed to perform prediction for test sample: " << i <<"\n";
           return EXIT_FAILURE;
       }
 

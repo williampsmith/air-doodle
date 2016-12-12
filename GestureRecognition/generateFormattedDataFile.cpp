@@ -14,7 +14,7 @@ int main (int argc, const char * argv[])
     trainingData.setNumDimensions( 6 );
 
     //You can also give the dataset a name (the name should have no spaces)
-    trainingData.setDatasetName("initialTrainingData");
+    trainingData.setDatasetName("piTrainingData");
 
     //You can also add some info text about the data
     trainingData.setInfoText("This data contains the initial training samples collected, in the format x_orientation, y_orientation, z_orientation, x_accel, y_accel, z_accel.");
@@ -24,7 +24,7 @@ int main (int argc, const char * argv[])
     UINT gestureLabel = 1;
     MatrixDouble trainingSample;
 
-    ifstream infile("trainingData/preformattedData.txt");
+    ifstream infile("./training_data/pi_data_089.txt");
 
     string line;
     for (int i = 0; i < 3; i++) { // for each classification index (0, 8 and 9 in our case)
@@ -34,16 +34,21 @@ int main (int argc, const char * argv[])
         trainingSample.clear();
         cout << endl << "Clearing training sample matrix. Size is " << trainingSample.getSize() << endl << endl;
 
+        getline(infile, line);
+        //cout << "Line retrieved: " << line << endl;
+
         while (getline(infile, line)) {
+          cout << "Line retrieved: " << line << endl;
           if ((line[0] != '%') && line.length() > 3){ // check for empty lines and delimiter lines
+            //cout << "Creating new training sample." << endl;
             VectorDouble sample( 6 );
             istringstream iss(line);
             double x_or, y_or, z_or, x_accel, y_accel, z_accel;
 
             // get all the data points from the line
             iss >> x_or >> y_or >> z_or >> x_accel >> y_accel >> z_accel;
-            // cout << "Sample:" << endl;
-            // cout << x_or << "  " << y_or << "  " << z_or << "  " << x_accel << "  " << y_accel << "  " << z_accel << endl;
+            cout << "Sample:" << endl;
+            cout << x_or << "  " << y_or << "  " << z_or << "  " << x_accel << "  " << y_accel << "  " << z_accel << endl;
 
             // populate the sample vector
             sample[0] = x_or;
@@ -68,43 +73,8 @@ int main (int argc, const char * argv[])
       }
     }
 
-    // //For now we will just add 10 x 20 random walk data timeseries
-    // Random random;
-    // for(UINT k = 0; k < 2; k++) {
-    //     gestureLabel = k+1;
-    //
-    //     //Get the init random walk position for this gesture
-    //     VectorDouble startPos( trainingData.getNumDimensions() );
-    //     for(UINT j=0; j<startPos.size(); j++){
-    //         startPos[j] = random.getRandomNumberUniform(-1.0,1.0);
-    //     }
-    //
-    //     //Generate the 20 time series
-    //     for(UINT x=0; x<20; x++){
-    //
-    //         //Clear any previous timeseries
-    //         trainingSample.clear();
-    //
-    //         //Generate the random walk
-    //         UINT randomWalkLength = random.getRandomNumberInt(90, 110);
-    //         VectorDouble sample = startPos;
-    //         for(UINT i=0; i<randomWalkLength; i++){
-    //             for(UINT j=0; j<startPos.size(); j++){
-    //                 sample[j] += random.getRandomNumberUniform(-0.1,0.1);
-    //             }
-    //
-    //             //Add the sample to the training sample
-    //             trainingSample.push_back( sample );
-    //         }
-    //
-    //         //Add the training sample to the dataset
-    //         trainingData.addSample( gestureLabel, trainingSample );
-    //
-    //     }
-    // }
-
     //After recording your training data you can then save it to a file
-    if( !trainingData.saveDatasetToFile( "TrainingData.txt" ) ){
+    if( !trainingData.saveDatasetToFile( "piTrainingData.txt" ) ){
         cout << "Failed to save dataset to file!\n";
         return EXIT_FAILURE;
     }
