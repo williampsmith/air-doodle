@@ -133,7 +133,8 @@ void logInput() {
 	}
 	std::cout << "Before Class" << std::endl;
 	uint8_t gesture = pipeline.getPredictedClassLabel();
-	std::cout << gesture << std::endl;
+	std::cout << " " << gesture << " " << std::endl;
+	std::cout << " " << nThread << " "<< std::endl;
 	std::cout << "After Class" << std::endl;
 
 	// Send threadNum and recognized gesture to bluetooth function

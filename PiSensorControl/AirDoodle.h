@@ -58,7 +58,7 @@ void decrementThreads();	// Decrements number of threads currently running
 
 // Bluetooth global variables
 int blue_sock, status;
-struct sockaddr_rc blue_conn = {0};
+sockaddr_rc blue_conn = {0};
 
 // Sensor global variables
 Adafruit_BNO055 bno055;
