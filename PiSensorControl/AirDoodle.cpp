@@ -11,11 +11,15 @@
 // Handler for the button interrupt
 void irq_handler() {
 	// Attempt to acquire newData lock (if fails we are already collecting so ignore)
-	if (pthread_mutex_trylock(&newData) == 0) {
+	if (!collect && (pthread_mutex_trylock(&newData) == 0)) {
+		collect = true;
+		clock = millis();
 		// Begin logging new data
 		logInput();
 		// Release newData lock
 		pthread_mutex_unlock(&newData);
+	} else if ((millis - clock) > 200) {
+		collect = false;
 	}
 }
 
@@ -58,7 +62,7 @@ void decrementThreads() {
 }
 
 // Drop in function for new thread
-void* analyze(void* args) {
+void *analyze(void* args) {
 	thread_arg_struct* inputs = (thread_arg_struct*) args;
 
 	std::cout << "Size: " << inputs->matrix.getSize() << std::endl;
@@ -80,7 +84,11 @@ void* analyze(void* args) {
 		decrementThreads();
 		return NULL;
 	}
+	std::cout << "Before Class" << std::endl;
 	uint8_t gesture = pipeline.getPredictedClassLabel();
+	std::cout << "Gesture: " << gesture << " " << std::endl;
+	std::cout << "Thread Num: " << inputs->threadNum << " "<< std::endl;
+	std::cout << "After Class" << std::endl;
 
 	// Send threadNum and recognized gesture to bluetooth function
 	send(inputs->threadNum, gesture);
@@ -99,20 +107,19 @@ void logInput() {
 	GRT::VectorDouble input_vector(5);
 	double move = 2;
 
-	// Read BNO055 data until movemnet stops
+	// Read BNO055 data until second button press
 	std::vector<double> vo;
 	std::vector<double> va;
-	while (move > 0.2) {
+	while (collect) {
 		vo = bno055.getVector(bno055.VECTOR_EULER);
 		va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
-		//input_vector[0] = (float) vo[0]; // REMOVE BAD FOR CLASS
+		//input_vector[0] = (float) vo[0]; // REMOVE: THROUGHS OFF CLASSIFICATION
 		input_vector[0] = vo[1];
 		input_vector[1] = vo[2];
 		input_vector[2] = va[0];
 		input_vector[3] = va[1];
 		input_vector[4] = va[2];
 		input_matrix.push_back(input_vector);
-		move = std::sqrt(va[0]*va[0] + va[1]*va[1] + va[2]*va[2]);
 		std::cout << vo[1] << " " << vo[2] << " " << va[0] << " " << va[1] << " " << va[2] << std::endl;
 		std::cout << input_vector[0] << " " << input_vector[1] << " " << input_vector[2] << " " << input_vector[3] << " " << input_vector[4] << std::endl;
 		std::cout << std::endl;
@@ -133,16 +140,16 @@ void logInput() {
 	}
 	std::cout << "Before Class" << std::endl;
 	uint8_t gesture = pipeline.getPredictedClassLabel();
-	std::cout << " " << gesture << " " << std::endl;
-	std::cout << " " << nThread << " "<< std::endl;
+	std::cout << "Gesture: " << gesture << " " << std::endl;
+	std::cout << "Thread Num: " << nThread << " "<< std::endl;
 	std::cout << "After Class" << std::endl;
 
 	// Send threadNum and recognized gesture to bluetooth function
 	send(nThread, gesture);
 
-	// Read MPU6050 data until movemnet stops
+	// Read MPU6050 data until second button press
 	// int16_t ax, ay, az, gx, gy, gz;
-	// while (move > 1.1) {
+	// while (collect) {
 	// 	mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 	// 	input_vector[0] = (float) ax;
 	// 	input_vector[1] = (float) ay;
@@ -151,7 +158,6 @@ void logInput() {
 	// 	input_vector[4] = (float) gy;
 	// 	input_vector[5] = (float) gz;
 	// 	input_matrix.push_back(input_vector);
-	// 	move = (double) std::sqrt(ax*ax + ay*ay + az*az);
 	// }
 
 	// Create structs for new thread
