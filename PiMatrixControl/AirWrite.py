@@ -60,7 +60,8 @@ try:
         if (len(pos) == 0): break
         time.sleep(0.5)
         val = client_sock.recv(1024)
-        #pos = int(pos)
+        pos = int(ord(pos))
+        val = int(ord(val))
         #val = int(val)
         print 'Received => Pos: [', pos, ' ] Val: [', val, ' ]' #gestures[val]
         #
