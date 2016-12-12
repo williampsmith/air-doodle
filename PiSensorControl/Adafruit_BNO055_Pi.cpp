@@ -42,7 +42,7 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode) {
     while (fd < 0) {
       std::cout << "Failed to open device: " << strerror(errno) << " ... ";
       delay(500);
-      std::cout << "Trying again..." << endl;
+      std::cout << "Trying again..." << std::endl;
       fd = open(_device, O_RDWR | O_NOCTTY | O_NDELAY);
     }
 
@@ -51,26 +51,26 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode) {
     struct termios uart_config;
     ret = tcgetattr(fd, &uart_config);
     if (ret < 0) {
-      std::cout << "Failed to get attr." << endl;
+      std::cout << "Failed to get attr." << std::endl;
       return false;
     }
 
     uart_config.c_oflag &= ~ONLCR;
     ret = cfsetispeed(&uart_config, B38400);
     if (ret < 0) {
-      std::cout << "Failed to set input speed." << endl;
+      std::cout << "Failed to set input speed." << std::endl;
       return false;
     }
 
     ret = cfsetospeed(&uart_config, B38400);
     if (ret < 0) {
-      std::cout << "Failed to set output speed." << endl;
+      std::cout << "Failed to set output speed." << std::endl;
       return false;
     }
 
     ret = tcsetattr(fd, TCSANOW, &uart_config);
     if (ret < 0) {
-      std::cout << "Failed to set attr." << endl;
+      std::cout << "Failed to set attr." << std::endl;
       return false;
     }
   } else {
@@ -79,12 +79,12 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode) {
     while (fd < 0) {
       std::cout << "Failed to open device: " << strerror(errno) << " ... ";
       delay(500);
-      std::cout << "Trying again..." << endl;
+      std::cout << "Trying again..." << std::endl;
       fd = open(_device, O_RDWR | O_NOCTTY | O_NDELAY);
     }
 
     if (ioctl(fd, I2C_SLAVE, _address) < 0) {
-        std::cout << "Failed to select device: " << strerror(errno) << endl;
+        std::cout << "Failed to select device: " << strerror(errno) << std::endl;
         close(fd);
         return false;
     }
@@ -501,12 +501,12 @@ bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, uint8_t value) {
     while (fd < 0) {
       std::cout << "Failed to open device: " << strerror(errno) << " ... ";
       delay(500);
-      std::cout << "Trying again..." << endl;
+      std::cout << "Trying again..." << std::endl;
       fd = open(_device, O_RDWR | O_NOCTTY | O_NDELAY);
     }
 
     if (ioctl(fd, I2C_SLAVE, _address) < 0) {
-        std::cout << "Failed to select device: " << strerror(errno) << endl;
+        std::cout << "Failed to select device: " << strerror(errno) << std::endl;
         close(fd);
         return false;
     }
@@ -519,13 +519,13 @@ bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, uint8_t value) {
   int count = -1;
   count = write(fd, buf, 2);
   if (count < 0) {
-      std::cout << "Failed to write device " << count << ": " << ::strerror(errno) << endl;
+      std::cout << "Failed to write device " << count << ": " << ::strerror(errno) << std::endl;
       if (!_isPi) {
         close(fd);
       }
       return false;
   } else if (count != 2) {
-      std::cout << "Short write  from device, expected " << 2 << ", got " << count << endl;
+      std::cout << "Short write  from device, expected " << 2 << ", got " << count << std::endl;
       if (!_isPi) {
         close(fd);
       }
@@ -549,19 +549,19 @@ bool Adafruit_BNO055::readLen(adafruit_bno055_reg_t reg, uint8_t* buffer, uint8_
     while (fd < 0) {
       std::cout << "Failed to open device: " << strerror(errno) << " ... ";
       delay(500);
-      std::cout << "Trying again..." << endl;
+      std::cout << "Trying again..." << std::endl;
       fd = open(_device, O_RDWR | O_NOCTTY | O_NDELAY);
     }
 
     if (ioctl(fd, I2C_SLAVE, _address) < 0) {
-        std::cout << "Failed to select device: " << strerror(errno) << endl;
+        std::cout << "Failed to select device: " << strerror(errno) << std::endl;
         close(fd);
         return false;
     }
   }
 
   if (write(fd, &reg, 1) != 1) {
-      std::cout << "Failed to write reg: " << strerror(errno) << endl;
+      std::cout << "Failed to write reg: " << strerror(errno) << std::endl;
       if (!_isPi) {
         close(fd);
       }
@@ -571,13 +571,13 @@ bool Adafruit_BNO055::readLen(adafruit_bno055_reg_t reg, uint8_t* buffer, uint8_
   int count = 0;
   count = read(fd, buffer, len);
   if (count < 0) {
-      std::cout << "Failed to read device " << count << ": " << ::strerror(errno) << endl;
+      std::cout << "Failed to read device " << count << ": " << ::strerror(errno) << std::endl;
       if (!_isPi) {
         close(fd);
       }
       return false;
   } else if (count != len) {
-      std::cout << "Short read  from device, expected " << len+1 << ", got " << count << endl;
+      std::cout << "Short read  from device, expected " << len+1 << ", got " << count << std::endl;
       if (!_isPi) {
         close(fd);
       }
