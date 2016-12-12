@@ -68,7 +68,7 @@ void* analyze(void* args) {
 
 	//Setup a custom recognition pipeline
   	GRT::GestureRecognitionPipeline pipeline;
-  	if (!pipeline.load("Pi_DTW_Pipeline_Model.txt")) {
+  	if (!pipeline.load("Pi2_DTW_Pipeline_Model.txt")) {
   		std::cout << "Failed to load the classifier model" << std::endl;
 		decrementThreads();
   		return NULL;
@@ -76,7 +76,7 @@ void* analyze(void* args) {
 
 	// Predict gesture using the classifier
 	if (!pipeline.predict(inputs->matrix)) {
-		std::cout << "Failed to perform prediction for thread " << inputs->threadNum << inputs->threadNum << std::endl;
+		std::cout << "Failed to perform prediction for thread " << inputs->threadNum << std::endl;
 		decrementThreads();
 		return NULL;
 	}
@@ -121,19 +121,19 @@ void logInput() {
 
 	//Setup a custom recognition pipeline
   	GRT::GestureRecognitionPipeline pipeline;
-  	if (!pipeline.load("Pi_DTW_Pipeline_Model.txt")) {
+  	if (!pipeline.load("Pi2_DTW_Pipeline_Model.txt")) {
   		std::cout << "Failed to load the classifier model" << std::endl;
 		decrementThreads();
-  		return NULL;
   	}
 
 	// Predict gesture using the classifier
 	if (!pipeline.predict(input_matrix)) {
-		std::cout << "Failed to perform prediction for thread " << inputs->threadNum << inputs->threadNum << std::endl;
+		std::cout << "Failed to perform prediction for thread " << nThread << std::endl;
 		decrementThreads();
-		return NULL;
 	}
+	std::cout << "Before Class" << std::endl;
 	uint8_t gesture = pipeline.getPredictedClassLabel();
+	std::cout << "After Class" << std::endl;
 	std::cout << gesture << std::endl;
 
 	// Send threadNum and recognized gesture to bluetooth function
@@ -154,13 +154,13 @@ void logInput() {
 	// }
 
 	// Create structs for new thread
-	pthread_t pth;
-	thread_arg_struct* inputs;
-	inputs->threadNum = nThread;
-	inputs->matrix = input_matrix;
+//	pthread_t pth;
+//	thread_arg_struct* inputs;
+//	inputs->threadNum = nThread;
+//	inputs->matrix = input_matrix;
 
 	// Split off into new thread for analysis
-	pthread_create(&pth, &thread_attr, &analyze, &inputs);
+//	pthread_create(&pth, &thread_attr, &analyze, &inputs);
 
 	// Increment thread counts
 	pthread_mutex_lock(&threads);
@@ -220,7 +220,7 @@ int main(int argc, char **argv) {
  	//  delay(100);
 	// }
 
-        // Setup and connect via bluetooth to display unit
+    // Setup and connect via bluetooth to display unit
 	blue_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 	blue_conn.rc_family = AF_BLUETOOTH;
 	blue_conn.rc_channel = (uint8_t) SERVER_CHANNEL;
