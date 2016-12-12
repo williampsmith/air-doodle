@@ -31,7 +31,7 @@ void send(uint8_t tNum, uint8_t gesture) {
 	while (status < 0) {
 		std::cout << "Error sending " << tNum << " to server... ";
 		delay(50);
-		std::cout << "Trying again...\n";
+		std::cout << "Trying again..." << endl;
 		status = write(blue_sock, (char *) &tNum, 1);
 	}
 
@@ -41,7 +41,7 @@ void send(uint8_t tNum, uint8_t gesture) {
 	while (status < 0) {
 		std::cout << "Error sending " << gesture << " to server... ";
 		delay(50);
-		std::cout << "Trying again...\n";
+		std::cout << "Trying again..." << endl;
 		status = write(blue_sock, (char *) &gesture, 1);
 	}
 
@@ -63,14 +63,14 @@ void* analyze(void* args) {
 	//Setup a custom recognition pipeline
   	GRT::GestureRecognitionPipeline pipeline;
   	if (!pipeline.load("DTW_Pipeline_Model.txt")) {
-  		std::cout << "Failed to load the classifier model\n";
+  		std::cout << "Failed to load the classifier model" << endl;
 		decrementThreads();
   		return NULL;
   	}
 
 	// Predict gesture using the classifier
 	if (!pipeline.predict(inputs->matrix)) {
-		std::cout << "Failed to perform prediction for thread " << inputs->threadNum << "\n";
+		std::cout << "Failed to perform prediction for thread " << inputs->threadNum << endl;
 		decrementThreads();
 		return NULL;
 	}
@@ -142,7 +142,7 @@ void logInput() {
 int main(int argc, char **argv) {
 	// Setup wiringPi
 	if (wiringPiSetup() < 0) {
-		std::cout << "Unable to setup wiringPi: " << strerror(errno) << "\n";
+		std::cout << "Unable to setup wiringPi: " << strerror(errno) << endl;
 		return EXIT_FAILURE;
   	}
 
@@ -153,9 +153,9 @@ int main(int argc, char **argv) {
  	bno055 = Adafruit_BNO055(-1, BNO055_ADDRESS, I2C_PI, false);
  	//bno055 = Adafruit_BNO055(); // Needs more work (uart not connecting)
  	while (!bno055.begin()) {
-		std::cout << "Oops, no sensor connected ... Check your wiring or ADDR!\n";
+		std::cout << "Oops, no sensor connected ... Check your wiring or ADDR! ";
 		delay(500);
-		std::cout << "Trying Again...\n";
+		std::cout << "Trying Again..." << endl;
 	}
 
 	// Test code for BNO055 sensor
@@ -164,7 +164,7 @@ int main(int argc, char **argv) {
 	while (true) {
 		vo = bno055.getVector(bno055.VECTOR_EULER);
 		va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
-		std::cout << vo[0] << "\t" << vo[1] << "\t" << vo[2] << "\t" << va[0] << "\t" << va[1] << "\t" << va[2] << "\n";
+		std::cout << vo[0] << "\t" << vo[1] << "\t" << vo[2] << "\t" << va[0] << "\t" << va[1] << "\t" << va[2] << endl;
  	 	fflush(stdout);
  	 	delay(10);
 	}
@@ -173,16 +173,16 @@ int main(int argc, char **argv) {
  	//  mpu6050 = MPU6050();
 	// mpu6050.initialize();
  	//  while (!mpu6050.testConnection()) {
-	// 	std::cout << "Oops, no sensor connected ... Check your wiring or I2C ADDR!\n";
+	// 	std::cout << "Oops, no sensor connected ... Check your wiring or I2C ADDR! ";
 	// 	delay(500);
-	// 	std::cout << "Trying Again...\n";
+	// 	std::cout << "Trying Again..." << endl;
 	// }
 
 	// Test code for MPU6050 sensor
 	// int16_t ax, ay, az, gx, gy, gz = 0;
 	// while (true) {
 	// 	mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-	// 	std::cout << ax << "\t" << ay << "\t" << az << "\t" << gx << "\t" << gy << "\t" << gz << "\n";
+	// 	std::cout << ax << "\t" << ay << "\t" << az << "\t" << gx << "\t" << gy << "\t" << gz << endl;
  	//  fflush(stdout);
  	//  delay(100);
 	// }
@@ -194,39 +194,39 @@ int main(int argc, char **argv) {
 	str2ba(SERVER_BADDR_CHAR, &blue_conn.rc_bdaddr);
 	status = connect(blue_sock, (struct sockaddr *) &blue_conn, sizeof(blue_conn));
 	if (status < 0) {
-		std::cout << "Error connecting to server\n";
+		std::cout << "Error connecting to server" << endl;
 		return EXIT_FAILURE;
 	}
 
 	// Setup threaded environment & mutexes
 	if (pthread_mutexattr_init(&mutex_attr) != 0) {
-		std::cout << "Error initializing mutex attr.\n";
+		std::cout << "Error initializing mutex attr." << endl;
 		return EXIT_FAILURE;
 	}
 	if (pthread_mutex_init(&blue, &mutex_attr) != 0) {
-		std::cout << "Error creating blue mutex.\n";
+		std::cout << "Error creating blue mutex." << endl;
 		return EXIT_FAILURE;
 	}
 	if (pthread_mutex_init(&newData, &mutex_attr) != 0) {
-		std::cout << "Error creating newData mutex.\n";
+		std::cout << "Error creating newData mutex." << endl;
 		return EXIT_FAILURE;
 	}
 	if (pthread_mutex_init(&threads, &mutex_attr) != 0) {
-		std::cout << "Error creating threads mutex.\n";
+		std::cout << "Error creating threads mutex." << endl;
 		return EXIT_FAILURE;
 	}
 	if (pthread_attr_init(&thread_attr) != 0) {
-		std::cout << "Error in pthread_attr_init\n";
+		std::cout << "Error in pthread_attr_init" << endl;
 		return EXIT_FAILURE;
 	}
 	if (pthread_attr_setdetachstate(&thread_attr, PTHREAD_CREATE_DETACHED) != 0) {
-		std::cout << "Error in pthread_attr_setdetachstate\n";
+		std::cout << "Error in pthread_attr_setdetachstate" << endl;
 		return EXIT_FAILURE;
 	}
 
 	// Setup interrupts
 	if (wiringPiISR(BUTTON0_PIN, INT_EDGE_FALLING, &irq_handler) < 0 ) {
-    	std::cout << "Unable to setup ISR: " << strerror(errno) << "\n";
+    	std::cout << "Unable to setup ISR: " << strerror(errno) << endl;
       	return EXIT_FAILURE;
   	}
 
@@ -254,7 +254,7 @@ int main(int argc, char **argv) {
 	while (status < 0) {
 		std::cout << "Error sending end command to server... ";
 		delay(50);
-		std::cout << "Trying again...\n";
+		std::cout << "Trying again..." << endl;
 		status = write(blue_sock, "", 1);
 	}
 
