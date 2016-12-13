@@ -219,7 +219,7 @@ def rotateBitmapMatrix90(bitmapMatrix, direction = -1, x0 = 0, y0 = 0, x1 = 31, 
 
 
 # *********************************************************************************
-
+'''
 arduino = serial.Serial(port='/dev/cu.usbmodem1411', baudrate=115200, timeout=0.1)
 
 time.sleep(1) # give the connection a second to settle
@@ -277,6 +277,6 @@ writeToSerial(arduino, stringToBitmap("W"))
 #     bitmap = matrixToBitmap(bitmapMatrix)
 #     writeToSerial(arduino, bitmap)
 #     time.sleep(1)
-
+'''
 # *********************************************************************************
 
