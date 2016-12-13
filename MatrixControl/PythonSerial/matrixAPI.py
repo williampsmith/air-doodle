@@ -270,7 +270,13 @@ time.sleep(1)
 # writeToSerial(arduino, bitmap)
 # bitmapMatrix = scrollBitmapMatrixLeftRightOffScreen(bitmapMatrix, numPixels = 32, pixelSkip = 4, direction = 1, period = 0.02)
 
-writeToSerial(arduino, stringToBitmap("W"))
+writeToSerial(arduino, stringToBitmap("0"))
+time.sleep(1)
+writeToSerial(arduino, stringToBitmap("08"))
+time.sleep(1)
+writeToSerial(arduino, stringToBitmap("089"))
+time.sleep(1)
+scrollBitmapMatrixLeftRightOffScreen(stringToBitmapMatrix("089"), numPixels = 32, pixelSkip = 6)
 
 # for _ in range(4):
 #     bitmapMatrix = rotateBitmapMatrix90(bitmapMatrix)
