@@ -53,7 +53,7 @@
 // Second Stage Thread Functions
 void irq_handler();	// Handles interrupts and function calls
 void *analyze(void* args);	// Parse input acceleration matrix
-void send(uint8_t tNum, uint8_t gesture);	// Send character and position to waiting edison
+void send(uint8_t* data, uint8_t len);	// Send character and position to waiting edison
 void logInput();	// Response for button interrupt to start logging data
 void decrementThreads();	// Decrements number of threads currently running
 

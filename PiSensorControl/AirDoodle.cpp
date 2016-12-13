@@ -11,15 +11,11 @@
 // Handler for the button interrupt
 void irq_handler() {
 	// Attempt to acquire newData lock (if fails we are already collecting so ignore)
-	if (!collect && (pthread_mutex_trylock(&newData) == 0)) {
-		collect = true;
-		start = millis();
+	if (pthread_mutex_trylock(&newData) == 0) {
 		// Begin logging new data
 		logInput();
 		// Release newData lock
 		pthread_mutex_unlock(&newData);
-	} else if ((millis() - start) > 200) {
-		collect = false;
 	}
 }
 
@@ -27,33 +23,18 @@ void irq_handler() {
 // ---------- HELPER FUNCTIONS -----------
 
 // Transmit gesture classification via the bluetooth connection
-void send(uint8_t tNum, uint8_t gesture) {
-	// Make data array
-	char data[2];
-	data[0] = (char*) tNum;
-	data[1] = (char*) gesture;
-
+void send(uint8_t* data, uint8_t len) {
 	// Acquire blue lock
 	pthread_mutex_lock(&blue);
 
 	// Send [tNum gesture] to awating pi
-	status = write(blue_sock, data, 2);
+	status = write(blue_sock, (char*) data, len);
 	while (status < 0) {
-		std::cout << "Error sending thread " << tNum << " to server... ";
+		std::cout << "Error sending thread " << data[0] << " to server... ";
 		delay(100);
 		std::cout << "Trying again..." << std::endl;
-		status = write(blue_sock, data, 2);
+		status = write(blue_sock, data, len);
 	}
-
-	// delay(500);
-	// // Send gesture label
-	// status = write(blue_sock, (char *) &gesture, 1);
-	// while (status < 0) {
-	// 	std::cout << "Error sending " << gesture << " to server... ";
-	// 	delay(50);
-	// 	std::cout << "Trying again..." << std::endl;
-	// 	status = write(blue_sock, (char *) &gesture, 1);
-	// }
 
 	// Release blue lock
 	pthread_mutex_unlock(&blue);
@@ -69,16 +50,17 @@ void decrementThreads() {
 // Drop in function for new thread
 void *analyze(void* args) {
 	thread_arg_struct* inputs = (thread_arg_struct*) args;
+	uint8_t data[3];
 
 	//std::cout << "Size: " << inputs->matrix.getSize() << std::endl;
 	//std::cout << "Rows: " << inputs->matrix.getNumRows() << std::endl;
 	//std::cout << "Cols: " << inputs->matrix.getNumCols() << std::endl;
 
-
 	//Setup a custom recognition pipeline
   	GRT::GestureRecognitionPipeline pipeline;
-  	if (!pipeline.load("AirDoodl_DTW_Pipeline_Model.txt")) {
+  	if (!pipeline.load("AirDoodle_DTW_Pipeline_Model.txt")) {
   		std::cout << "Failed to load the classifier model" << std::endl;
+		std::cout << std::endl;
 		decrementThreads();
   		return NULL;
   	}
@@ -86,14 +68,21 @@ void *analyze(void* args) {
 	// Predict gesture using the classifier
 	if (!pipeline.predict(inputs->matrix)) {
 		std::cout << "Failed to perform prediction for thread " << inputs->threadNum << std::endl;
+		std::cout << std::endl;
 		decrementThreads();
 		return NULL;
 	}
-	uint8_t gesture = pipeline.getPredictedClassLabel();
-	//std::cout << "Thread Num: " << inputs->threadNum << ", Gesture: " << gesture << std::endl;
+	data[0] = inputs->threadNum;
+	data[1] = pipeline.getPredictedClassLabel();
+	data[2] = (uint8_t) (pipeline.getMaximumLikelihood()*100);
+	//if (data[2] < 40) {
+	//	data[1] = 0;
+	//}
+	std::cout << "Thread Num: " << unsigned(data[0]) << ", Gesture: " << unsigned(data[1]) << ", Likelihood: " << unsigned(data[2]) << std::endl;
+	std::cout << std::endl;
 
 	// Send threadNum and recognized gesture to bluetooth function
-	send(inputs->threadNum, gesture);
+	send(data, 3);
 
 	// End of thread run
 	decrementThreads();
@@ -104,28 +93,30 @@ void logInput() {
 	std::cout << "Entered logInput" << std::endl;
 	//delay(500);
 
-	GRT::VectorDouble input_vector(5);
+	GRT::VectorDouble input_vector(3);
 	thread_arg_struct* inputs = new thread_arg_struct;
 	inputs->threadNum = nThread;
 
 	//std::cout << "Collecting Data..." << std::endl;
 
 	// Read BNO055 data until second button press
-	std::vector<double> vo;
+	//std::vector<double> vo;
 	std::vector<double> va;
 	digitalWrite(PIN1_LED, HIGH);
 	while (digitalRead(PIN0_BUTTON) != LOW) {
-		vo = bno055.getVector(bno055.VECTOR_EULER);
+		//vo = bno055.getVector(bno055.VECTOR_EULER);
 		va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
 		//input_vector[0] = (float) vo[0]; // REMOVE: THROUGHS OFF CLASSIFICATION
-		input_vector[0] = vo[1];
-		input_vector[1] = vo[2];
-		input_vector[2] = va[0];
-		input_vector[3] = va[1];
-		input_vector[4] = va[2];
-		inputs->matrix.push_back(input_vector);
+		//input_vector[1] = vo[1];
+		//input_vector[2] = vo[2];
+		//input_vector[0] = va[0];
+		//input_vector[1] = va[1];
+		//input_vector[2] = va[2];
+		//inputs->matrix.push_back(input_vector);
+		inputs->matrix.push_back(va);
 		//std::cout << vo[1] << " " << vo[2] << " " << va[0] << " " << va[1] << " " << va[2] << std::endl;
-		std::cout << input_vector[0] << " " << input_vector[1] << " " << input_vector[2] << " " << input_vector[3] << " " << input_vector[4] << std::endl;
+		std::cout << va[0] << " " << va[1] << " " << va[2] << std::endl;
+		//std::cout << input_vector[0] << " " << input_vector[1] << " " << input_vector[2] << " " << input_vector[3] << " " << input_vector[4] << std::endl;
 		//std::cout << std::endl;
 		delay(50);
 	}
@@ -145,6 +136,11 @@ void logInput() {
 	// }
 
 	//std::cout << "Creating thread..." << std::endl;
+	if (inputs->matrix.getNumRows() < 10) {
+		std::cout << "Not enough data (only " << inputs->matrix.getNumRows() << " rows)" << std::endl;
+		std::cout << std::endl;
+		return;
+	}
 
 	// Create thread struct for split
 	pthread_t pth;

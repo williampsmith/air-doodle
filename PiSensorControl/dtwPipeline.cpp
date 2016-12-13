@@ -8,12 +8,12 @@ int main(int argc, const char * argv[])
     cout << "Not enough arguments! Only got " << argc-1 << " expected 2" << endl;
     return EXIT_FAILURE;
   }
-  
+
   // //Setup a custom recognition pipeline
   GestureRecognitionPipeline pipeline;
 
   //Add a low pass filter to the pipeline with a buffer size of 3 samples and dimension 6
-  pipeline << MovingAverageFilter(4, 5);
+  pipeline << MovingAverageFilter(4, 3);
 
   //Add a custom feature extraction algorithm that will use the output of the FFT as input
   // pipeline << MyCustomFeatureAlgorithm();

@@ -20,7 +20,7 @@ int main(int argc, const char * argv[])
 
   //Load a labeled data set from a txt file and train a classification model
   LabelledTimeSeriesClassificationData trainingData;
-  trainingData.load( "pi2TrainingData.txt" );
+  trainingData.load( "ord.txt" );
 
   //Use 25% of the training dataset to create a test dataset
   LabelledTimeSeriesClassificationData testData = trainingData.split( 75 );
@@ -38,14 +38,14 @@ int main(int argc, const char * argv[])
   }
 
   //Save the pipeline model to a file
-  success = pipeline.save("Pi4_DTW_Pipeline_Model.txt");
+  success = pipeline.save("Pi6_DTW_Pipeline_Model.txt");
   if(!success){
       cout << "Failed to save the classifier model!\n";
       return EXIT_FAILURE;
   }
 
   //Load the pipline model from a file
-  success = pipeline.load("Pi4_DTW_Pipeline_Model.txt");
+  success = pipeline.load("Pi6_DTW_Pipeline_Model.txt");
   if(!success){
       cout << "Failed to load the classifier model!\n";
       return EXIT_FAILURE;

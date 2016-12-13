@@ -20,10 +20,10 @@
 #define BUTTON0_PIN 0
 
 int main(int argc, char* argv[]) {
-	if (argc < 4) {
-		std::cout << "Not enough arguments! Only got " << argc-1 << " expected 3" << std::endl;
-		return EXIT_FAILURE;
-	}
+//	if (argc < 4) {
+//		std::cout << "Not enough arguments! Only got " << argc-1 << " expected 3" << std::endl;
+//		return EXIT_FAILURE;
+//	}
 
 	// Get data collection
 	const char* let = argv[1];
@@ -57,19 +57,20 @@ int main(int argc, char* argv[]) {
 	int curr = 0;
 	for (int num = 0; num < strlen(let); num++) {
 		for (int curr = 0; curr < numSamps; curr++) {
-			if (digitalRead(BUTTON0_PIN) == 1) {
-				std::cout << "Prepare to write: " << let[num] << std::endl;
-				ofs << "%" << let[num] << std::endl;
-				delay(3000);
-				while (digitalRead(BUTTON0_PIN) == 1) {
-					vo = bno055.getVector(bno055.VECTOR_EULER);
-					va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
-					std::cout << vo[0] << "\t" << vo[1] << "\t" << vo[2] << "\t" << va[0] << "\t" << va[1] << "\t" << va[2] << std::endl;
-					ofs << vo[0] << " " << vo[1] << " " << vo[2] << " " << va[0] << " " << va[1] << " " << va[2] << std::endl;
-					delay(50);
-				}
-				ofs << std::endl;
+			while (digitalRead(BUTTON0_PIN) != HIGH) {
+				delay(100);
 			}
+			std::cout << "Prepare to write: " << let[num] << std::endl;
+			ofs << "%" << let[num] << std::endl;
+			delay(3000);
+			while (digitalRead(BUTTON0_PIN) == HIGH) {
+				vo = bno055.getVector(bno055.VECTOR_EULER);
+				va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
+				std::cout << vo[0] << "\t" << vo[1] << "\t" << vo[2] << "\t" << va[0] << "\t" << va[1] << "\t" << va[2] << std::endl;
+				ofs << vo[0] << " " << vo[1] << " " << vo[2] << " " << va[0] << " " << va[1] << " " << va[2] << std::endl;
+				delay(50);
+			}
+			ofs << std::endl;
 			delay(100);
 		}
 	}
