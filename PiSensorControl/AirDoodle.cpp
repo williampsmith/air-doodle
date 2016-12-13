@@ -28,27 +28,32 @@ void irq_handler() {
 
 // Transmit gesture classification via the bluetooth connection
 void send(uint8_t tNum, uint8_t gesture) {
+	// Make data array
+	char data[2];
+	data[0] = (char*) tNum;
+	data[1] = (char*) gesture;
+
 	// Acquire blue lock
 	pthread_mutex_lock(&blue);
 
-	// Send thread number for ordering
-	status = write(blue_sock, (char *) &tNum, 1);
+	// Send [tNum gesture] to awating pi
+	status = write(blue_sock, data, 2);
 	while (status < 0) {
-		std::cout << "Error sending " << tNum << " to server... ";
-		delay(50);
+		std::cout << "Error sending thread " << tNum << " to server... ";
+		delay(100);
 		std::cout << "Trying again..." << std::endl;
-		status = write(blue_sock, (char *) &tNum, 1);
+		status = write(blue_sock, data, 2);
 	}
 
-	delay(500);
-	// Send gesture label
-	status = write(blue_sock, (char *) &gesture, 1);
-	while (status < 0) {
-		std::cout << "Error sending " << gesture << " to server... ";
-		delay(50);
-		std::cout << "Trying again..." << std::endl;
-		status = write(blue_sock, (char *) &gesture, 1);
-	}
+	// delay(500);
+	// // Send gesture label
+	// status = write(blue_sock, (char *) &gesture, 1);
+	// while (status < 0) {
+	// 	std::cout << "Error sending " << gesture << " to server... ";
+	// 	delay(50);
+	// 	std::cout << "Trying again..." << std::endl;
+	// 	status = write(blue_sock, (char *) &gesture, 1);
+	// }
 
 	// Release blue lock
 	pthread_mutex_unlock(&blue);
