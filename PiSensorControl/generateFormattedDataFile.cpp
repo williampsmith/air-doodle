@@ -7,14 +7,19 @@ using namespace std;
 
 int main (int argc, const char * argv[])
 {
+    if (argc < 4) {
+        cout << "Not enough arguments! Only got " << argc-1 << " expected 3" << endl;
+        return EXIT_FAILURE;
+    }
+
     //Create a new instance of the TimeSeriesClassificationData
     TimeSeriesClassificationData trainingData;
 
     //Set the dimensionality of the data (you need to do this before you can add any samples)
-    trainingData.setNumDimensions( /*6*/ 5 );
+    trainingData.setNumDimensions( 3 );
 
     //You can also give the dataset a name (the name should have no spaces)
-    trainingData.setDatasetName("piTrainingData");
+    trainingData.setDatasetName(argv[1]);
 
     //You can also add some info text about the data
     trainingData.setInfoText("This data contains the initial training samples collected, in the format x_orientation, y_orientation, z_orientation, x_accel, y_accel, z_accel.");
@@ -24,7 +29,7 @@ int main (int argc, const char * argv[])
     UINT gestureLabel = 1;
     MatrixDouble trainingSample;
 
-    ifstream infile("./training_data/pi_data_089.txt");
+    ifstream infile(argv[2]);
 
     string line;
     for (int i = 0; i < 3; i++) { // for each classification index (0, 8 and 9 in our case)
@@ -41,22 +46,22 @@ int main (int argc, const char * argv[])
           cout << "Line retrieved: " << line << endl;
           if ((line[0] != '%') && line.length() > 3){ // check for empty lines and delimiter lines
             //cout << "Creating new training sample." << endl;
-            VectorDouble sample( 5 );
+            VectorDouble sample( 3 );
             istringstream iss(line);
             double x_or, y_or, z_or, x_accel, y_accel, z_accel;
 
             // get all the data points from the line
-            iss >> x_or >> y_or >> z_or >> x_accel >> y_accel >> z_accel;
+            iss >> x_accel >> y_accel >> z_accel;
             cout << "Sample:" << endl;
-            cout /*<< x_or << "  " */ << y_or << "  " << z_or << "  " << x_accel << "  " << y_accel << "  " << z_accel << endl;
+            //cout /*<< x_or << "  " */ << y_or << "  " << z_or << "  " << x_accel << "  " << y_accel << "  " << z_accel << endl;
 
             // populate the sample vector
             //sample[0] = x_or;
-            sample[0] = y_or;
-            sample[1] = z_or;
-            sample[2] = x_accel;
-            sample[3] = y_accel;
-            sample[4] = z_accel;
+            //sample[0] = y_or;
+            //sample[1] = z_or;
+            sample[0] = x_accel;
+            sample[1] = y_accel;
+            sample[2] = z_accel;
 
             trainingSample.push_back(sample);
             cout << "training sample size: " << trainingSample.getSize() << endl;
@@ -74,7 +79,7 @@ int main (int argc, const char * argv[])
     }
 
     //After recording your training data you can then save it to a file
-    if( !trainingData.saveDatasetToFile( "pi2TrainingData.txt" ) ){
+    if( !trainingData.saveDatasetToFile(argv[3]) ){
         cout << "Failed to save dataset to file!\n";
         return EXIT_FAILURE;
     }

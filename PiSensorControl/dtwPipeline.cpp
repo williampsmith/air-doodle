@@ -4,23 +4,28 @@ using namespace GRT;
 
 int main(int argc, const char * argv[])
 {
+  if (argc < 3) {
+    cout << "Not enough arguments! Only got " << argc-1 << " expected 2" << endl;
+    return EXIT_FAILURE;
+  }
+
   // //Setup a custom recognition pipeline
   GestureRecognitionPipeline pipeline;
 
   //Add a low pass filter to the pipeline with a buffer size of 3 samples and dimension 6
-  pipeline << MovingAverageFilter(4, 5);
+  pipeline << MovingAverageFilter(4, 3);
 
   //Add a custom feature extraction algorithm that will use the output of the FFT as input
   // pipeline << MyCustomFeatureAlgorithm();
 
   //Add a Dynamic Time Warp Classifier and enable trimming
   DTW dtw;
-  dtw.enableTrimTrainingData(true, 0.05, 90); // 10% thresholding
+  dtw.enableTrimTrainingData(true, 0.01, 90);
   pipeline << dtw;
 
   //Load a labeled data set from a txt file and train a classification model
   LabelledTimeSeriesClassificationData trainingData;
-  trainingData.load( "ord.txt" );
+  trainingData.load(argv[1]);
 
   //Use 25% of the training dataset to create a test dataset
   LabelledTimeSeriesClassificationData testData = trainingData.split( 75 );
@@ -38,14 +43,14 @@ int main(int argc, const char * argv[])
   }
 
   //Save the pipeline model to a file
-  success = pipeline.save("Pi6_DTW_Pipeline_Model.txt");
+  success = pipeline.save(argv[2]);
   if(!success){
       cout << "Failed to save the classifier model!\n";
       return EXIT_FAILURE;
   }
 
   //Load the pipline model from a file
-  success = pipeline.load("Pi6_DTW_Pipeline_Model.txt");
+  success = pipeline.load(argv[2]);
   if(!success){
       cout << "Failed to load the classifier model!\n";
       return EXIT_FAILURE;

@@ -24,9 +24,11 @@
 #include "Adafruit_BNO055_Pi.h"
 
 // Creates a new sensor
-Adafruit_BNO055::Adafruit_BNO055(int32_t sensorID, uint8_t address) {
+Adafruit_BNO055::Adafruit_BNO055(int32_t sensorID, uint8_t address, const char* device, bool isPi) {
   _sensorID = sensorID;
   _address = address;
+  _device = device;
+  _isPi = isPi;
 }
 
 
@@ -34,8 +36,59 @@ Adafruit_BNO055::Adafruit_BNO055(int32_t sensorID, uint8_t address) {
 
 // Sets up the hardware
 bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode) {
-  // Enable I2C
-  i2c = wiringPiI2CSetup(_address);
+  if (_isPi) {
+    // Setup UART connection
+    fd = open(_device, O_RDWR | O_NOCTTY | O_NDELAY);
+    while (fd < 0) {
+      std::cout << "Failed to open device: " << strerror(errno) << " ... ";
+      delay(500);
+      std::cout << "Trying again..." << std::endl;
+      fd = open(_device, O_RDWR | O_NOCTTY | O_NDELAY);
+    }
+
+    // Initialize serial port (for uart)
+    int ret = 0;
+    struct termios uart_config;
+    ret = tcgetattr(fd, &uart_config);
+    if (ret < 0) {
+      std::cout << "Failed to get attr." << std::endl;
+      return false;
+    }
+
+    uart_config.c_oflag &= ~ONLCR;
+    ret = cfsetispeed(&uart_config, B38400);
+    if (ret < 0) {
+      std::cout << "Failed to set input speed." << std::endl;
+      return false;
+    }
+
+    ret = cfsetospeed(&uart_config, B38400);
+    if (ret < 0) {
+      std::cout << "Failed to set output speed." << std::endl;
+      return false;
+    }
+
+    ret = tcsetattr(fd, TCSANOW, &uart_config);
+    if (ret < 0) {
+      std::cout << "Failed to set attr." << std::endl;
+      return false;
+    }
+  } else {
+    // Setup I2C connection
+    fd = open(_device, O_RDWR);
+    while (fd < 0) {
+      std::cout << "Failed to open device: " << strerror(errno) << " ... ";
+      delay(500);
+      std::cout << "Trying again..." << std::endl;
+      fd = open(_device, O_RDWR | O_NOCTTY | O_NDELAY);
+    }
+
+    if (ioctl(fd, I2C_SLAVE, _address) < 0) {
+        std::cout << "Failed to select device: " << strerror(errno) << std::endl;
+        close(fd);
+        return false;
+    }
+  }
 
   // Make sure we have the right device
   uint8_t id = read8(BNO055_CHIP_ID_ADDR);
@@ -86,6 +139,10 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode) {
   // Set the requested operating mode (see section 3.3)
   setMode(mode);
   delay(20);
+
+  if (!_isPi) {
+    close(fd);
+  }
 
   return true;
 }
@@ -293,7 +350,7 @@ bool Adafruit_BNO055::getEvent(sensors_event_t *event) {
   event->version   = sizeof(sensors_event_t);
   event->sensor_id = _sensorID;
   event->type      = SENSOR_TYPE_ORIENTATION;
-  event->timestamp = millis();
+  event->timestamp = clock();
 
   // Get a Euler angle sample for orientation
   std::vector<double> euler = getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -432,24 +489,99 @@ bool Adafruit_BNO055::isFullyCalibrated(void) {
 
 // PRIVATE FUNCTIONS //
 
-// Writes an 8 bit value over I2C
-bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, byte value) {
-  wiringPiI2CWriteReg8(i2c, reg, value);
+// Sleep for ms long (in milliseconds)
+void Adafruit_BNO055::delay(unsigned long ms) {
+  usleep(ms*1000);
+}
+
+// Writes an 8 bit value over I2C (uart for Pi)
+bool Adafruit_BNO055::write8(adafruit_bno055_reg_t reg, uint8_t value) {
+  if (!_isPi) {
+    fd = open(_device, O_RDWR);
+    while (fd < 0) {
+      std::cout << "Failed to open device: " << strerror(errno) << " ... ";
+      delay(500);
+      std::cout << "Trying again..." << std::endl;
+      fd = open(_device, O_RDWR | O_NOCTTY | O_NDELAY);
+    }
+
+    if (ioctl(fd, I2C_SLAVE, _address) < 0) {
+        std::cout << "Failed to select device: " << strerror(errno) << std::endl;
+        close(fd);
+        return false;
+    }
+  }
+
+  uint8_t buf[2];
+  buf[0] = reg;
+  buf[1] = value;
+
+  int count = -1;
+  count = write(fd, buf, 2);
+  if (count < 0) {
+      std::cout << "Failed to write device " << count << ": " << ::strerror(errno) << std::endl;
+      if (!_isPi) {
+        close(fd);
+      }
+      return false;
+  } else if (count != 2) {
+      std::cout << "Short write  from device, expected " << 2 << ", got " << count << std::endl;
+      if (!_isPi) {
+        close(fd);
+      }
+      return false;
+  }
+
   return true;
 }
 
-// Reads an 8 bit value over I2C
-byte Adafruit_BNO055::read8(adafruit_bno055_reg_t reg ) {
-  byte value = 0;
-  value = wiringPiI2CReadReg8(i2c, reg);
-
-  return value;
+// Reads an 8 bit value over I2C (uart for Pi)
+uint8_t Adafruit_BNO055::read8(adafruit_bno055_reg_t reg ) {
+  uint8_t value[1];
+  readLen(reg, value, 1);
+  return value[0];
 }
 
-// Reads the specified number of bytes over I2C
-bool Adafruit_BNO055::readLen(adafruit_bno055_reg_t reg, byte * buffer, uint8_t len) {
-  for (uint8_t i = 0; i < len; i++) {
-    buffer[i] = wiringPiI2CReadReg8(i2c, reg);
+// Reads the specified number of bytes over I2C (uart for Pi)
+bool Adafruit_BNO055::readLen(adafruit_bno055_reg_t reg, uint8_t* buffer, uint8_t len) {
+  if (!_isPi) {
+    fd = open(_device, O_RDWR);
+    while (fd < 0) {
+      std::cout << "Failed to open device: " << strerror(errno) << " ... ";
+      delay(500);
+      std::cout << "Trying again..." << std::endl;
+      fd = open(_device, O_RDWR | O_NOCTTY | O_NDELAY);
+    }
+
+    if (ioctl(fd, I2C_SLAVE, _address) < 0) {
+        std::cout << "Failed to select device: " << strerror(errno) << std::endl;
+        close(fd);
+        return false;
+    }
+  }
+
+  if (write(fd, &reg, 1) != 1) {
+      std::cout << "Failed to write reg: " << strerror(errno) << std::endl;
+      if (!_isPi) {
+        close(fd);
+      }
+      return false;
+  }
+
+  int count = 0;
+  count = read(fd, buffer, len);
+  if (count < 0) {
+      std::cout << "Failed to read device " << count << ": " << ::strerror(errno) << std::endl;
+      if (!_isPi) {
+        close(fd);
+      }
+      return false;
+  } else if (count != len) {
+      std::cout << "Short read  from device, expected " << len+1 << ", got " << count << std::endl;
+      if (!_isPi) {
+        close(fd);
+      }
+      return false;
   }
 
   return true;

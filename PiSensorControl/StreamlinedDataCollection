@@ -1,0 +1,4 @@
+#!/bin/sh -e
+
+# $1 = dataSet, $2 = samples, $3 = Outset, $4 = setName, $5 = outOrd, $6 = outTrain
+./StreamlinedDataCollectionScript 089 20 samp.txt Pi_089 ord.txt trained.txt

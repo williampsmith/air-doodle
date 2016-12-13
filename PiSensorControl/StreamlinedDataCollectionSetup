@@ -1,8 +1,13 @@
 #!/bin/sh -e
-# Buildfile for DataCollection on Raspberry Pi
 
 # With BNO055
 g++ Adafruit_BNO055_Pi.cpp DataCollection.cpp -o DataCollection -lwiringPi
 
 # With MPU6050
 #g++ I2Cdev.cpp MPU6050.cpp DataCollection.cpp -o DataCollection -lwiringPi
+
+# Formatted Data File
+g++ -std=c++11 generateFormattedDataFile.cpp -o generateFormattedDataFile -lgrt
+
+# DTW Pipeline
+g++ -std=c++11 dtwPipeline.cpp -o dtwPipeline -lgrt
