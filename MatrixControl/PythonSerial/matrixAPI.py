@@ -223,7 +223,7 @@ def scrollBitmapMatrixUpDownOffScreen(bitmapMatrix, numPixels = 1, pixelSkip = 1
 arduino = serial.Serial(port='/dev/cu.usbmodem1411', baudrate=115200, timeout=0.1)
 
 time.sleep(1) # give the connection a second to settle
-arduino.setDTR(level=0)
+arduino.setDTR(0)
 time.sleep(1)
 
 # writeCharacter(arduino, 'A')
