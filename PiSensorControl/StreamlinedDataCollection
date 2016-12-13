@@ -1,16 +1,4 @@
 #!/bin/sh -e
 
-# Collect Data
-# $1 = gestures, $2 = numSamples, $3 = outputFile (Raw Data)
-sudo ./DataCollection $1 $2 $3
-
-# Remove x gyro (bad for classification)
-cut -d " " -f 2- $3 > "$3.nogx"
-
-# Parse Data
-# $4 = dataset name, $3 = inputFile (output of last stage), $5 = outputFile (Formatted Data)
-sudo ./generateFormattedDataFile $4 "$3.nogx" $5
-
-# Train/Classify Data
-# $5 = inputFile (output of last stage), $6 = outputFile (Model)
-sudo ./dtwPipeline $5 $6
+# $1 = dataSet, $2 = samples, $3 = Outset, $4 = setName, $5 = outOrd, $6 = outTrain
+sudo ./StreamlinedDataCollectionScript 089 20 samp.txt Pi_089 ord.txt trained.txt
