@@ -34,8 +34,9 @@
 
 // ---------- GLOBAL DEFINITIONS -----------
 
-#define BUTTON0_PIN	0 // Button for interrupts
-#define BUTTON1_PIN 1 // Button to exit
+#define PIN0_BUTTON	0 // Interrupt Button
+#define PIN1_LED 1 // LED Pin
+#define PIN2_BUTTON 2 // Exit Button
 
 #define SERVER_CHANNEL	1 // Channel for the bluetooth connection
 #define SERVER_BADDR_CHAR "B8:27:EB:A1:D8:3F" // Bluetooth MAC address for the edison
@@ -51,14 +52,14 @@
 
 // Second Stage Thread Functions
 void irq_handler();	// Handles interrupts and function calls
-void* analyze(void* args);	// Parse input acceleration matrix
+void *analyze(void* args);	// Parse input acceleration matrix
 void send(uint8_t tNum, uint8_t gesture);	// Send character and position to waiting edison
 void logInput();	// Response for button interrupt to start logging data
 void decrementThreads();	// Decrements number of threads currently running
 
 // Bluetooth global variables
 int blue_sock, status;
-struct sockaddr_rc blue_conn = {0};
+sockaddr_rc blue_conn = {0};
 
 // Sensor global variables
 Adafruit_BNO055 bno055;
@@ -72,6 +73,8 @@ pthread_mutex_t newData;
 pthread_mutex_t threads;
 uint8_t aliveThreads = 0;
 uint8_t nThread = 0;
+bool collect = true;
+unsigned int start;
 typedef struct {
 	uint8_t threadNum;
 	GRT::MatrixDouble matrix;

@@ -11,11 +11,15 @@
 // Handler for the button interrupt
 void irq_handler() {
 	// Attempt to acquire newData lock (if fails we are already collecting so ignore)
-	if (pthread_mutex_trylock(&newData) == 0) {
+	if (!collect && (pthread_mutex_trylock(&newData) == 0)) {
+		collect = true;
+		start = millis();
 		// Begin logging new data
 		logInput();
 		// Release newData lock
 		pthread_mutex_unlock(&newData);
+	} else if ((millis() - start) > 200) {
+		collect = false;
 	}
 }
 
@@ -24,27 +28,32 @@ void irq_handler() {
 
 // Transmit gesture classification via the bluetooth connection
 void send(uint8_t tNum, uint8_t gesture) {
+	// Make data array
+	char data[2];
+	data[0] = (char*) tNum;
+	data[1] = (char*) gesture;
+
 	// Acquire blue lock
 	pthread_mutex_lock(&blue);
 
-	// Send thread number for ordering
-	status = write(blue_sock, (char *) &tNum, 1);
+	// Send [tNum gesture] to awating pi
+	status = write(blue_sock, data, 2);
 	while (status < 0) {
-		std::cout << "Error sending " << tNum << " to server... ";
-		delay(50);
+		std::cout << "Error sending thread " << tNum << " to server... ";
+		delay(100);
 		std::cout << "Trying again..." << std::endl;
-		status = write(blue_sock, (char *) &tNum, 1);
+		status = write(blue_sock, data, 2);
 	}
 
-	delay(500);
-	// Send gesture label
-	status = write(blue_sock, (char *) &gesture, 1);
-	while (status < 0) {
-		std::cout << "Error sending " << gesture << " to server... ";
-		delay(50);
-		std::cout << "Trying again..." << std::endl;
-		status = write(blue_sock, (char *) &gesture, 1);
-	}
+	// delay(500);
+	// // Send gesture label
+	// status = write(blue_sock, (char *) &gesture, 1);
+	// while (status < 0) {
+	// 	std::cout << "Error sending " << gesture << " to server... ";
+	// 	delay(50);
+	// 	std::cout << "Trying again..." << std::endl;
+	// 	status = write(blue_sock, (char *) &gesture, 1);
+	// }
 
 	// Release blue lock
 	pthread_mutex_unlock(&blue);
@@ -58,17 +67,17 @@ void decrementThreads() {
 }
 
 // Drop in function for new thread
-void* analyze(void* args) {
+void *analyze(void* args) {
 	thread_arg_struct* inputs = (thread_arg_struct*) args;
 
-	std::cout << "Size: " << inputs->matrix.getSize() << std::endl;
-	std::cout << "Rows: " << inputs->matrix.getNumRows() << std::endl;
-	std::cout << "Cols: " << inputs->matrix.getNumCols() << std::endl;
+	//std::cout << "Size: " << inputs->matrix.getSize() << std::endl;
+	//std::cout << "Rows: " << inputs->matrix.getNumRows() << std::endl;
+	//std::cout << "Cols: " << inputs->matrix.getNumCols() << std::endl;
 
 
 	//Setup a custom recognition pipeline
   	GRT::GestureRecognitionPipeline pipeline;
-  	if (!pipeline.load("Pi2_DTW_Pipeline_Model.txt")) {
+  	if (!pipeline.load("AirDoodl_DTW_Pipeline_Model.txt")) {
   		std::cout << "Failed to load the classifier model" << std::endl;
 		decrementThreads();
   		return NULL;
@@ -81,67 +90,50 @@ void* analyze(void* args) {
 		return NULL;
 	}
 	uint8_t gesture = pipeline.getPredictedClassLabel();
+	//std::cout << "Thread Num: " << inputs->threadNum << ", Gesture: " << gesture << std::endl;
 
 	// Send threadNum and recognized gesture to bluetooth function
 	send(inputs->threadNum, gesture);
 
 	// End of thread run
 	decrementThreads();
-	return NULL;
 }
 
 // Logging function
 void logInput() {
 	std::cout << "Entered logInput" << std::endl;
-	delay(500);
+	//delay(500);
 
-	GRT::MatrixDouble input_matrix;
 	GRT::VectorDouble input_vector(5);
-	double move = 2;
+	thread_arg_struct* inputs = new thread_arg_struct;
+	inputs->threadNum = nThread;
 
-	// Read BNO055 data until movemnet stops
+	//std::cout << "Collecting Data..." << std::endl;
+
+	// Read BNO055 data until second button press
 	std::vector<double> vo;
 	std::vector<double> va;
-	while (move > 0.2) {
+	digitalWrite(PIN1_LED, HIGH);
+	while (digitalRead(PIN0_BUTTON) != LOW) {
 		vo = bno055.getVector(bno055.VECTOR_EULER);
 		va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
-		//input_vector[0] = (float) vo[0]; // REMOVE BAD FOR CLASS
+		//input_vector[0] = (float) vo[0]; // REMOVE: THROUGHS OFF CLASSIFICATION
 		input_vector[0] = vo[1];
 		input_vector[1] = vo[2];
 		input_vector[2] = va[0];
 		input_vector[3] = va[1];
 		input_vector[4] = va[2];
-		input_matrix.push_back(input_vector);
-		move = std::sqrt(va[0]*va[0] + va[1]*va[1] + va[2]*va[2]);
+		inputs->matrix.push_back(input_vector);
+		//std::cout << vo[1] << " " << vo[2] << " " << va[0] << " " << va[1] << " " << va[2] << std::endl;
 		std::cout << input_vector[0] << " " << input_vector[1] << " " << input_vector[2] << " " << input_vector[3] << " " << input_vector[4] << std::endl;
-		std::cout << vo[0] << " " << vo[1] << " " << vo[2] << " " << va[0] << " " << va[1] << " " << va[2] << std::endl;
-		std::cout << std::endl;
+		//std::cout << std::endl;
 		delay(50);
 	}
+	digitalWrite(PIN1_LED, LOW);
 
-	//Setup a custom recognition pipeline
-  	GRT::GestureRecognitionPipeline pipeline;
-  	if (!pipeline.load("Pi2_DTW_Pipeline_Model.txt")) {
-  		std::cout << "Failed to load the classifier model" << std::endl;
-		decrementThreads();
-  	}
-
-	// Predict gesture using the classifier
-	if (!pipeline.predict(input_matrix)) {
-		std::cout << "Failed to perform prediction for thread " << nThread << std::endl;
-		decrementThreads();
-	}
-	std::cout << "Before Class" << std::endl;
-	uint8_t gesture = pipeline.getPredictedClassLabel();
-	std::cout << "After Class" << std::endl;
-	std::cout << gesture << std::endl;
-
-	// Send threadNum and recognized gesture to bluetooth function
-	send(nThread, gesture);
-
-	// Read MPU6050 data until movemnet stops
+	// Read MPU6050 data until second button press
 	// int16_t ax, ay, az, gx, gy, gz;
-	// while (move > 1.1) {
+	// while (collect) {
 	// 	mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 	// 	input_vector[0] = (float) ax;
 	// 	input_vector[1] = (float) ay;
@@ -150,23 +142,24 @@ void logInput() {
 	// 	input_vector[4] = (float) gy;
 	// 	input_vector[5] = (float) gz;
 	// 	input_matrix.push_back(input_vector);
-	// 	move = (double) std::sqrt(ax*ax + ay*ay + az*az);
 	// }
 
-	// Create structs for new thread
-//	pthread_t pth;
-//	thread_arg_struct* inputs;
-//	inputs->threadNum = nThread;
-//	inputs->matrix = input_matrix;
+	//std::cout << "Creating thread..." << std::endl;
+
+	// Create thread struct for split
+	pthread_t pth;
 
 	// Split off into new thread for analysis
-//	pthread_create(&pth, &thread_attr, &analyze, &inputs);
+	pthread_create(&pth, &thread_attr, &analyze, (void *) inputs);
 
 	// Increment thread counts
 	pthread_mutex_lock(&threads);
 	aliveThreads = aliveThreads + 1;
 	nThread = nThread + 1;
 	pthread_mutex_unlock(&threads);
+
+	std::cout << "Leaving logInput" << std::endl;
+	std::cout << std::endl;
 }
 
 
@@ -180,7 +173,8 @@ int main(int argc, char **argv) {
   	}
 
   	// Setup buttons
-  	pinMode(BUTTON1_PIN, INPUT);
+  	pinMode(PIN1_LED, OUTPUT);
+  	pinMode(PIN2_BUTTON, INPUT);
 
   	// Setup BNO055 sensor
  	bno055 = Adafruit_BNO055(-1, BNO055_ADDRESS, I2C_PI, false);
@@ -220,7 +214,7 @@ int main(int argc, char **argv) {
  	//  delay(100);
 	// }
 
-    // Setup and connect via bluetooth to display unit
+        // Setup and connect via bluetooth to display unit
 	blue_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 	blue_conn.rc_family = AF_BLUETOOTH;
 	blue_conn.rc_channel = (uint8_t) SERVER_CHANNEL;
@@ -258,16 +252,17 @@ int main(int argc, char **argv) {
 	}
 
 	// Setup interrupts
-	if (wiringPiISR(BUTTON0_PIN, INT_EDGE_FALLING, &irq_handler) < 0 ) {
-    	std::cout << "Unable to setup ISR: " << strerror(errno) << std::endl;
-      	return EXIT_FAILURE;
+	while (wiringPiISR(PIN0_BUTTON, INT_EDGE_RISING, &irq_handler) < 0 ) {
+    		std::cout << "Unable to setup ISR: " << strerror(errno) << " ... ";
+		delay(500);
+		std::cout << "Trying again..." << std::endl;
   	}
 
   	for (;;) {
-  		if (false) { //digitalRead(BUTTON1_PIN) == 1) {
+  		if (digitalRead(PIN2_BUTTON) == 1) {
   			break;
   		} else {
-  			delay(50);
+  			delay(500);
   		}
   	}
 
