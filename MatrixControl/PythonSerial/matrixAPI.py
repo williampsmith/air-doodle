@@ -1,5 +1,6 @@
 from characterBitmapMatrices import getBitmapMatrixOfCharacter
 import serial, time
+# import numpy as np
 
 def writeToSerial(destination, bitmap, shouldClearDisplay = 1, timeout = 0.04):
     # destination: serial destination such as to Arduino
@@ -222,7 +223,7 @@ def scrollBitmapMatrixUpDownOffScreen(bitmapMatrix, numPixels = 1, pixelSkip = 1
 arduino = serial.Serial(port='/dev/cu.usbmodem1411', baudrate=115200, timeout=0.1)
 
 time.sleep(1) # give the connection a second to settle
-arduino.setDTR(0)
+arduino.setDTR(level=0)
 time.sleep(1)
 
 # writeCharacter(arduino, 'A')
