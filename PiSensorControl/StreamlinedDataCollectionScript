@@ -5,7 +5,7 @@
 sudo ./DataCollection $1 $2 $3
 
 # Remove x gyro (bad for classification)
-cut -d " " -f 2- $3 > "$3.nogx"
+sudo cut -d " " -f 2- $3 > "$3.nogx"
 
 # Parse Data
 # $4 = dataset name, $3 = inputFile (output of last stage), $5 = outputFile (Formatted Data)
