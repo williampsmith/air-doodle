@@ -1,5 +1,5 @@
 from letterBitmapMatrices import getBitmapMatrixOfCharacter
-import numpy as np
+#import numpy as np
 import serial, time
 
 def writeToSerial(destination, bitmap, shouldClearDisplay = 1, timeout = 0.04):
@@ -134,39 +134,40 @@ def scrollBitmapMatrixUpDownOffScreen(bitmapMatrix, numPixels = 1, pixelSkip = 1
         time.sleep(period)
     return newBitmapMatrix
 
-def rotateBitmapMatrix90(bitmapMatrix, direction = -1, x0 = 0, y0 = 0, x1 = 31, y1 = 31):
-    # This function mutates bitmapMatrix so that it is rotated
-    # Rotate a matrix by 90 degrees
-    # Direction: -1 means counter-clockwise, 1 means clockwise
-    # Rotate the rectangle given by x0,y0,x1,y1
-    # x0,y0: start of rectangle
-    # x1,y1: end of rectangle
-    rotatedMatrix = []
-    for row in range(y0, y1 + 1):
-        rotatedMatrix.append([])
-        for col in range(x0, x1 + 1):
-            rotatedMatrix[row].append(bitmapMatrix[row][col])
+# def rotateBitmapMatrix90(bitmapMatrix, direction = -1, x0 = 0, y0 = 0, x1 = 31, y1 = 31):
+#     # This function mutates bitmapMatrix so that it is rotated
+#     # Rotate a matrix by 90 degrees
+#     # Direction: -1 means counter-clockwise, 1 means clockwise
+#     # Rotate the rectangle given by x0,y0,x1,y1
+#     # x0,y0: start of rectangle
+#     # x1,y1: end of rectangle
+#     rotatedMatrix = []
+#     for row in range(y0, y1 + 1):
+#         rotatedMatrix.append([])
+#         for col in range(x0, x1 + 1):
+#             rotatedMatrix[row].append(bitmapMatrix[row][col])
 
-    if (direction == -1):
-        rotatedMatrix = np.rot90(rotatedMatrix, 1) # rotate 1 time 
-    else:
-        rotatedMatrix = np.rot90(rotatedMatrix, 3) # rotate 3 times, 360 - 90 = 270
+#     if (direction == -1):
+#         rotatedMatrix = np.rot90(rotatedMatrix, 1) # rotate 1 time 
+#     else:
+#         rotatedMatrix = np.rot90(rotatedMatrix, 3) # rotate 3 times, 360 - 90 = 270
 
-    rows = y1 - y0 + 1
-    cols = x1 - x0 + 1
-    for row in range(rows):
-        for col in range(cols):
-            bitmapMatrix[row + x0][col + y0] = rotatedMatrix[row][col]
+#     rows = y1 - y0 + 1
+#     cols = x1 - x0 + 1
+#     for row in range(rows):
+#         for col in range(cols):
+#             bitmapMatrix[row + x0][col + y0] = rotatedMatrix[row][col]
             
-    return bitmapMatrix
+#     return bitmapMatrix
 
 
 
 
-arduino = serial.Serial(port='/dev/cu.usbmodem1411', baudrate=115200, timeout=0.1)
+#arduino = serial.Serial(port='/dev/cu.usbmodem1411', baudrate=115200, timeout=0.1)
+arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=0.1)
 
 time.sleep(1) # give the connection a second to settle
-arduino.setDTR(level=0)
+arduino.setDTR(0)
 time.sleep(1)
 
 # writeCharacter(arduino, 'A')

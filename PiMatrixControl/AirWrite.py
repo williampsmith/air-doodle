@@ -1,9 +1,11 @@
 import serial
 import time
 import bluetooth
+import letterBitmapMatrices as lbm
+import matrixAPI as matrix
 
 # gesture dictionary
-gestures = {1 : '0', 2 : '8', 3 : '9'}
+gestures = {0 : 'N', 1 : '0', 2 : '8', 3 : '9'}
 
 def writeCharacter(destination, character, shouldClearDisplay = 1, timeout = 0.04):
     # destination: serial destination such as to Arduino
@@ -17,10 +19,10 @@ def writeCharacter(destination, character, shouldClearDisplay = 1, timeout = 0.0
 
 print("Setting up arduino connection.")
 
-#arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=0.1)
+arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=0.1)
 
 time.sleep(1)
-#arduino.setDTR(0)
+arduino.setDTR(0)
 time.sleep(1)
 
 print("Arduino connection setup.")
@@ -61,33 +63,40 @@ while True:
         while True:
             data = client_sock.recv(1024)
             if (len(data) == 0): break
-            data = ord(data)
+            #data = ord(data)
+            #data = int(ord(data))
             time.sleep(0.5)
-            for i in range(0, len(data), 2):
-                pos = int(data[i])
-                val = int(data[i+1])
-                print 'Received => Pos: [', pos, ' ] Val: [', val, ' ]' #gestures[val]
-                #
-                # if pos == curr:
-                # 	#arduino.write(val.encode())
-                #     #writeCharacter(arduino, 'S')
-                #     writeCharacter(arduino, val)
-                #     time.sleep(0.5)
-                #     curr += 1
-                #     curr = curr % 256
-                #     #time.sleep(0.5)
-                #     while curr in w:
-                #     	#arduino.write(w.pop(curr).encode())
-                #         #writeToSerial(arduino, bitmap)
-                #         #writeCharacter(arduino, 'S')
-                #         writeCharacter(arduino, w.pop(curr))
-                #         time.sleep(0.5)
-                #     	curr += 1
-                #         curr = curr % 256
-                #     	#time.sleep(0.5)
-                #     else:
-                #         w[pos] = val
-                #     curr = curr % 256
+            for i in range(0, len(data), 3):
+                pos = int(ord(data[i]))
+                val = int(ord(data[i+1]))
+                max_likelihood = int(ord(data[i+2]))
+                print 'Received => Pos: [', pos, ' ] Val: [', gestures[val], ' ] Max Likelihood: [', max_likelihood, ' ]'
+                
+                if pos == curr:
+                	#arduino.write(val.encode())
+                    #writeCharacter(arduino, gestures[val])
+                    bitmapMatrix = matrix.attachLetterMatrixToBitmapMatrix(lbm.getBitmapMatrixOfCharacter(gestures[val]))
+                    bitmap = matrix.matrixToBitmap(bitmapMatrix)
+                    matrix.writeToSerial(arduino, bitmap)
+                    time.sleep(0.5)
+                    curr += 1
+                    curr = curr % 256
+                    #time.sleep(0.5)
+                    while curr in w:
+                    	#arduino.write(w.pop(curr).encode())
+                        #writeToSerial(arduino, bitmap)
+                        #writeCharacter(arduino, 'S')
+                        bitmapMatrix = matrix.attachLetterMatrixToBitmapMatrix(lbm.getBitmapMatrixOfCharacter(w.pop(curr)))
+                        bitmap = matrix.matrixToBitmap(bitmapMatrix)
+                        matrix.writeToSerial(arduino, bitmap)
+                        #writeCharacter(arduino, w.pop(curr))
+                        time.sleep(0.5)
+                    	curr += 1
+                        curr = curr % 256
+                    	#time.sleep(0.5)
+                    else:
+                        w[pos] = gestures[val]
+                    curr = curr % 256
     except IOError:
         pass
 
