@@ -1,7 +1,7 @@
 import serial
 import time
 import bluetooth
-import letterBitmapMatrices as lbm
+import characterBitmapMatrices as lbm
 import matrixAPI as matrix
 
 # gesture dictionary
@@ -58,6 +58,7 @@ while True:
 
     curr = 0
     w = {}
+    display_message = ''
 
     try:
         while True:
@@ -71,25 +72,20 @@ while True:
                 val = int(ord(data[i+1]))
                 max_likelihood = int(ord(data[i+2]))
                 print 'Received => Pos: [', pos, ' ] Val: [', gestures[val], ' ] Max Likelihood: [', max_likelihood, ' ]'
-                
+
                 if pos == curr:
-                	#arduino.write(val.encode())
-                    #writeCharacter(arduino, gestures[val])
-                    bitmapMatrix = matrix.attachLetterMatrixToBitmapMatrix(lbm.getBitmapMatrixOfCharacter(gestures[val]))
-                    bitmap = matrix.matrixToBitmap(bitmapMatrix)
-                    matrix.writeToSerial(arduino, bitmap)
+                    if len(display_message) > 5:
+                        matrix.scrollBitmapMatrixLeftRightOffscreen()
+                        display_message = ''
+                    display_message += gestures[val]
+                    matrix.writeToSerial(arduino, stringToBitmap(display_message))
                     time.sleep(0.5)
                     curr += 1
                     curr = curr % 256
                     #time.sleep(0.5)
                     while curr in w:
-                    	#arduino.write(w.pop(curr).encode())
-                        #writeToSerial(arduino, bitmap)
-                        #writeCharacter(arduino, 'S')
-                        bitmapMatrix = matrix.attachLetterMatrixToBitmapMatrix(lbm.getBitmapMatrixOfCharacter(w.pop(curr)))
-                        bitmap = matrix.matrixToBitmap(bitmapMatrix)
-                        matrix.writeToSerial(arduino, bitmap)
-                        #writeCharacter(arduino, w.pop(curr))
+                        display_message += w.pop(curr)
+                        matrix.writeToSerial(arduino, stringToBitmap(display_message))
                         time.sleep(0.5)
                     	curr += 1
                         curr = curr % 256
