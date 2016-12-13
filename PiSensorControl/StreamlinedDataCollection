@@ -1,4 +1,8 @@
 #!/bin/sh -e
 
-# $1 = dataSet, $2 = samples, $3 = Outset, $4 = setName, $5 = outOrd, $6 = outTrain
-./StreamlinedDataCollectionScript 089 20 samp.txt Pi_089 ord.txt trained.txt
+# Args: $1 Output folder
+
+mkdir $1
+
+# Script: $1 = set, $2 = numSamps, $3 = outSet, $4 = setName, $5 = outFormat, $6 = outTrain
+./StreamlinedDataCollectionScript 089 20 $1/samp.txt Pi_089 $1/ord.txt $1/trained.txt
