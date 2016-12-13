@@ -72,7 +72,7 @@ void *analyze(void* args) {
 
 	//Setup a custom recognition pipeline
   	GRT::GestureRecognitionPipeline pipeline;
-  	if (!pipeline.load("Pi3_DTW_Pipeline_Model.txt")) {
+  	if (!pipeline.load("AirDoodl_DTW_Pipeline_Model.txt")) {
   		std::cout << "Failed to load the classifier model" << std::endl;
 		decrementThreads();
   		return NULL;
@@ -85,6 +85,7 @@ void *analyze(void* args) {
 		return NULL;
 	}
 	uint8_t gesture = pipeline.getPredictedClassLabel();
+	//std::cout << "Thread Num: " << inputs->threadNum << ", Gesture: " << gesture << std::endl;
 
 	// Send threadNum and recognized gesture to bluetooth function
 	send(inputs->threadNum, gesture);
@@ -107,9 +108,8 @@ void logInput() {
 	// Read BNO055 data until second button press
 	std::vector<double> vo;
 	std::vector<double> va;
-	digitalWrite(BUTTON1_PIN, HIGH);
-//  	pinMode(BUTTON0_PIN, INPUT);
-	while (digitalRead(BUTTON0_PIN) != LOW) {
+	digitalWrite(PIN1_LED, HIGH);
+	while (digitalRead(PIN0_BUTTON) != LOW) {
 		vo = bno055.getVector(bno055.VECTOR_EULER);
 		va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
 		//input_vector[0] = (float) vo[0]; // REMOVE: THROUGHS OFF CLASSIFICATION
@@ -124,7 +124,7 @@ void logInput() {
 		//std::cout << std::endl;
 		delay(50);
 	}
-	digitalWrite(BUTTON1_PIN, LOW);
+	digitalWrite(PIN1_LED, LOW);
 
 	// Read MPU6050 data until second button press
 	// int16_t ax, ay, az, gx, gy, gz;
@@ -153,13 +153,6 @@ void logInput() {
 	nThread = nThread + 1;
 	pthread_mutex_unlock(&threads);
 
-//	while (wiringPiISR(BUTTON0_PIN, INT_EDGE_RISING, &irq_handler) < 0 ) {
-//    		std::cout << "Unable to setup ISR: " << strerror(errno) << " ... ";
-//		delay(500);
-//		std::cout << "Trying again..." << std::endl;
-//	}
-
-
 	std::cout << "Leaving logInput" << std::endl;
 	std::cout << std::endl;
 }
@@ -175,7 +168,8 @@ int main(int argc, char **argv) {
   	}
 
   	// Setup buttons
-  	pinMode(BUTTON1_PIN, OUTPUT);
+  	pinMode(PIN1_LED, OUTPUT);
+  	pinMode(PIN2_BUTTON, INPUT);
 
   	// Setup BNO055 sensor
  	bno055 = Adafruit_BNO055(-1, BNO055_ADDRESS, I2C_PI, false);
@@ -253,17 +247,17 @@ int main(int argc, char **argv) {
 	}
 
 	// Setup interrupts
-	while (wiringPiISR(BUTTON0_PIN, INT_EDGE_RISING, &irq_handler) < 0 ) {
+	while (wiringPiISR(PIN0_BUTTON, INT_EDGE_RISING, &irq_handler) < 0 ) {
     		std::cout << "Unable to setup ISR: " << strerror(errno) << " ... ";
 		delay(500);
 		std::cout << "Trying again..." << std::endl;
   	}
 
   	for (;;) {
-  		if (false) { //digitalRead(BUTTON1_PIN) == 1) {
+  		if (digitalRead(PIN2_BUTTON) == 1) {
   			break;
   		} else {
-  			delay(50);
+  			delay(500);
   		}
   	}
 

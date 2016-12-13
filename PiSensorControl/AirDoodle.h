@@ -34,8 +34,9 @@
 
 // ---------- GLOBAL DEFINITIONS -----------
 
-#define BUTTON0_PIN	0 // Button for interrupts
-#define BUTTON1_PIN 1 // Button to exit
+#define PIN0_BUTTON	0 // Interrupt Button
+#define PIN1_LED 1 // LED Pin
+#define PIN2_BUTTON 2 // Exit Button
 
 #define SERVER_CHANNEL	1 // Channel for the bluetooth connection
 #define SERVER_BADDR_CHAR "B8:27:EB:A1:D8:3F" // Bluetooth MAC address for the edison

@@ -20,6 +20,11 @@
 #define BUTTON0_PIN 0
 
 int main(int argc, char* argv[]) {
+	if (argc < 4) {
+		std::cout << "Not enough arguments! Only got " << argc-1 << " expected 3" << std::endl;
+		return EXIT_FAILURE;
+	}
+
 	// Get data collection
 	const char* let = argv[1];
 	int numSamps = strtol(argv[2], NULL, 10);
@@ -27,7 +32,7 @@ int main(int argc, char* argv[]) {
 	// Setup file
 	std::ofstream ofs;
         ofs.rdbuf()->pubsetbuf(0, 0);
-	ofs.open("testData.txt", std::ofstream::out | std::ofstream::app);
+	ofs.open(argv[3], std::ofstream::out | std::ofstream::app);
 
 	// Setup wiringPi
 	if (wiringPiSetup() < 0) {
@@ -51,8 +56,7 @@ int main(int argc, char* argv[]) {
 	std::vector<double> va;
 	int curr = 0;
 	for (int num = 0; num < strlen(let); num++) {
-		int curr = 0;
-		while (curr < numSamps) {
+		for (int curr = 0; curr < numSamps; curr++) {
 			if (digitalRead(BUTTON0_PIN) == 1) {
 				std::cout << "Prepare to write: " << let[num] << std::endl;
 				ofs << "%" << let[num] << std::endl;
@@ -65,7 +69,6 @@ int main(int argc, char* argv[]) {
 					delay(50);
 				}
 				ofs << std::endl;
-				curr = curr + 1;
 			}
 			delay(100);
 		}
