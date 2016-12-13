@@ -74,18 +74,19 @@ while True:
                 print 'Received => Pos: [', pos, ' ] Val: [', gestures[val], ' ] Max Likelihood: [', max_likelihood, ' ]'
 
                 if pos == curr:
-                    if len(display_message) > 5:
-                        matrix.scrollBitmapMatrixLeftRightOffscreen()
+                    if len(display_message) >= 4:
+                        matrix.scrollBitmapMatrixLeftRightOffScreen(arduino, matrix.stringToBitmapMatrix(display_message), numPixels = 32, pixelSkip = 6)
                         display_message = ''
                     display_message += gestures[val]
-                    matrix.writeToSerial(arduino, stringToBitmap(display_message))
+                    print 'display message:', display_message
+                    matrix.writeToSerial(arduino, matrix.stringToBitmap(display_message))
                     time.sleep(0.5)
                     curr += 1
                     curr = curr % 256
                     #time.sleep(0.5)
                     while curr in w:
                         display_message += w.pop(curr)
-                        matrix.writeToSerial(arduino, stringToBitmap(display_message))
+                        matrix.writeToSerial(arduino, matrix.stringToBitmap(display_message))
                         time.sleep(0.5)
                     	curr += 1
                         curr = curr % 256

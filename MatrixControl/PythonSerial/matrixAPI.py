@@ -107,7 +107,7 @@ def matrixToBitmap(bitmapMatrix):
             bitmap.append(display_int)
     return bitmap
 
-def scrollBitmapMatrixLeftRight(bitmapMatrix, numPixels = 1, pixelSkip = 1, direction = -1, period = 0.05):
+def scrollBitmapMatrixLeftRight(arduino, bitmapMatrix, numPixels = 1, pixelSkip = 1, direction = -1, period = 0.05):
     # Scroll the matrix 1 pixel left or right
     # numPixels: number of pixels to scroll
     # pixelSkip: number of pixels to skip
@@ -120,13 +120,13 @@ def scrollBitmapMatrixLeftRight(bitmapMatrix, numPixels = 1, pixelSkip = 1, dire
                 for col in range(32):
                     newBitmapMatrix[row][(col + direction) % 32] = bitmapMatrix[row][col]
             bitmapMatrix = newBitmapMatrix
-        
+
         bitmap = matrixToBitmap(bitmapMatrix)
         writeToSerial(arduino, bitmap)
         time.sleep(period)
     return newBitmapMatrix
 
-def scrollBitmapMatrixLeftRightOffScreen(bitmapMatrix, numPixels = 32, pixelSkip = 1, direction = -1, period = 0.05):
+def scrollBitmapMatrixLeftRightOffScreen(arduino, bitmapMatrix, numPixels = 32, pixelSkip = 1, direction = -1, period = 0.05):
     # Scroll the matrix 1 pixel left or right
     # numPixels: number of pixels to scroll
     # pixelSkip: number of pixels to skip
@@ -204,7 +204,7 @@ def scrollBitmapMatrixUpDownOffScreen(bitmapMatrix, numPixels = 1, pixelSkip = 1
 #             rotatedMatrix[row].append(bitmapMatrix[row][col])
 
 #     if (direction == -1):
-#         rotatedMatrix = np.rot90(rotatedMatrix, 1) # rotate 1 time 
+#         rotatedMatrix = np.rot90(rotatedMatrix, 1) # rotate 1 time
 #     else:
 #         rotatedMatrix = np.rot90(rotatedMatrix, 3) # rotate 3 times, 360 - 90 = 270
 
@@ -213,7 +213,7 @@ def scrollBitmapMatrixUpDownOffScreen(bitmapMatrix, numPixels = 1, pixelSkip = 1
 #     for row in range(rows):
 #         for col in range(cols):
 #             bitmapMatrix[row + x0][col + y0] = rotatedMatrix[row][col]
-            
+
 #     return bitmapMatrix
 
 
@@ -285,4 +285,3 @@ scrollBitmapMatrixLeftRightOffScreen(stringToBitmapMatrix("089"), numPixels = 32
 #     time.sleep(1)
 '''
 # *********************************************************************************
-
