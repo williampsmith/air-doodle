@@ -60,6 +60,7 @@ int main(int argc, char* argv[]) {
 		std::cout << std::endl;
 		std::cout << std::endl;
 		std::cout << "Now writing: " << let[num] << std::endl;
+		delay(2000);
 		std::cout << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
@@ -69,7 +70,7 @@ int main(int argc, char* argv[]) {
 			}
 			std::cout << "Prepare to write: " << let[num] << std::endl;
 			ofs << "%" << let[num] << std::endl;
-			delay(2000);
+			delay(1500);
 			while (digitalRead(BUTTON0_PIN) == HIGH) {
 				vo = bno055.getVector(bno055.VECTOR_EULER);
 				va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
