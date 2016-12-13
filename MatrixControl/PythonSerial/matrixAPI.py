@@ -107,7 +107,7 @@ def matrixToBitmap(bitmapMatrix):
             bitmap.append(display_int)
     return bitmap
 
-def scrollBitmapMatrixLeftRight(bitmapMatrix, numPixels = 1, pixelSkip = 1, direction = -1, period = 0.05):
+def scrollBitmapMatrixLeftRight(destination, bitmapMatrix, numPixels = 1, pixelSkip = 1, direction = -1, period = 0.05):
     # Scroll the matrix 1 pixel left or right
     # numPixels: number of pixels to scroll
     # pixelSkip: number of pixels to skip
@@ -122,11 +122,11 @@ def scrollBitmapMatrixLeftRight(bitmapMatrix, numPixels = 1, pixelSkip = 1, dire
             bitmapMatrix = newBitmapMatrix
         
         bitmap = matrixToBitmap(bitmapMatrix)
-        writeToSerial(arduino, bitmap)
+        writeToSerial(destination, bitmap)
         time.sleep(period)
     return newBitmapMatrix
 
-def scrollBitmapMatrixLeftRightOffScreen(bitmapMatrix, numPixels = 32, pixelSkip = 1, direction = -1, period = 0.05):
+def scrollBitmapMatrixLeftRightOffScreen(destination, bitmapMatrix, numPixels = 32, pixelSkip = 1, direction = -1, period = 0.05):
     # Scroll the matrix 1 pixel left or right
     # numPixels: number of pixels to scroll
     # pixelSkip: number of pixels to skip
@@ -143,12 +143,12 @@ def scrollBitmapMatrixLeftRightOffScreen(bitmapMatrix, numPixels = 32, pixelSkip
             bitmapMatrix = newBitmapMatrix
 
         bitmap = matrixToBitmap(bitmapMatrix)
-        writeToSerial(arduino, bitmap)
+        writeToSerial(destination, bitmap)
         time.sleep(period)
 
     return newBitmapMatrix
 
-def scrollBitmapMatrixUpDown(bitmapMatrix, numPixels = 1, pixelSkip = 1, direction = -1, period = 0.05):
+def scrollBitmapMatrixUpDown(destination, bitmapMatrix, numPixels = 1, pixelSkip = 1, direction = -1, period = 0.05):
     # Scroll the matrix 1 pixel left or right
     # numPixels: number of pixels to scroll
     # pixelSkip: number of pixels to skip
@@ -164,11 +164,11 @@ def scrollBitmapMatrixUpDown(bitmapMatrix, numPixels = 1, pixelSkip = 1, directi
             bitmapMatrix = newBitmapMatrix
 
         bitmap = matrixToBitmap(bitmapMatrix)
-        writeToSerial(arduino, bitmap)
+        writeToSerial(destination, bitmap)
         time.sleep(period)
     return newBitmapMatrix
 
-def scrollBitmapMatrixUpDownOffScreen(bitmapMatrix, numPixels = 1, pixelSkip = 1, direction = -1, period = 0.05):
+def scrollBitmapMatrixUpDownOffScreen(destination, bitmapMatrix, numPixels = 32, pixelSkip = 1, direction = -1, period = 0.05):
     # Scroll the matrix 1 pixel left or right
     # numPixels: number of pixels to scroll
     # pixelSkip: number of pixels to skip
@@ -186,7 +186,7 @@ def scrollBitmapMatrixUpDownOffScreen(bitmapMatrix, numPixels = 1, pixelSkip = 1
             bitmapMatrix = newBitmapMatrix
 
         bitmap = matrixToBitmap(bitmapMatrix)
-        writeToSerial(arduino, bitmap)
+        writeToSerial(destination, bitmap)
         time.sleep(period)
     return newBitmapMatrix
 
@@ -268,15 +268,19 @@ time.sleep(1)
 # bitmapMatrix = attachCharacterMatrixToBitmapMatrix(getBitmapMatrixOfCharacter('f', 1))
 # bitmap = matrixToBitmap(bitmapMatrix)
 # writeToSerial(arduino, bitmap)
-# bitmapMatrix = scrollBitmapMatrixLeftRightOffScreen(bitmapMatrix, numPixels = 32, pixelSkip = 4, direction = 1, period = 0.02)
+# bitmapMatrix = scrollBitmapMatrixLeftRightOffScreen(arduino, bitmapMatrix, numPixels = 32, pixelSkip = 4, direction = 1, period = 0.02)
 
 writeToSerial(arduino, stringToBitmap("0"))
 time.sleep(1)
+writeToSerial(arduino, stringToBitmap("8"))
+time.sleep(1)
+writeToSerial(arduino, stringToBitmap("9"))
+time.sleep(1)
 writeToSerial(arduino, stringToBitmap("08"))
 time.sleep(1)
-writeToSerial(arduino, stringToBitmap("089"))
+writeToSerial(arduino, stringToBitmap("89"))
 time.sleep(1)
-scrollBitmapMatrixLeftRightOffScreen(stringToBitmapMatrix("089"), numPixels = 32, pixelSkip = 6)
+scrollBitmapMatrixLeftRightOffScreen(arduino, stringToBitmapMatrix("089"), numPixels = 32, pixelSkip = 6)
 
 # for _ in range(4):
 #     bitmapMatrix = rotateBitmapMatrix90(bitmapMatrix)
