@@ -63,7 +63,7 @@ try:
         pos = int(ord(pos))
         val = int(ord(val))
         #val = int(val)
-        print 'Received => Pos: [', pos, ' ] Val: [', val, ' ]' #gestures[val]
+        print 'Received => Pos: [', pos, ' ] Val: [', gestures[val], ' ]' #gestures[val]
         #
         # if pos == curr:
         # 	#arduino.write(val.encode())
