@@ -151,7 +151,7 @@ void logInput() {
 	// Increment thread counts
 	pthread_mutex_lock(&threads);
 	aliveThreads = aliveThreads + 1;
-	nThread = nThread + 1;
+	nThread = (nThread + 1) % 256;
 	pthread_mutex_unlock(&threads);
 
 	std::cout << "Leaving logInput" << std::endl;

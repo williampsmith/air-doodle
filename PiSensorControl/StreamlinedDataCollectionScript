@@ -1,16 +1,22 @@
 #!/bin/sh -e
 
+# Args:	$1 = gestures, $2 = numSamples, $3 = outputFile (Raw)
+#		$4 = numCols
+#		$5 = datasetName, $6 = outputFile (Formatted)
+#		$7 = outputFile (Model)
+
 # Collect Data
 # $1 = gestures, $2 = numSamples, $3 = outputFile (Raw Data)
 sudo ./DataCollection $1 $2 $3
 
-# Remove x gyro (bad for classification)
+# Remove gyro (bad for classification) this command needs manual tuning
 sudo cut -d " " -f 4- $3 > "$3.nogyro"
 
 # Parse Data
-# $4 = dataset name, $3 = inputFile (output of last stage), $5 = outputFile (Formatted Data)
-sudo ./generateFormattedDataFile $4 "$3.nogyro" $5
+# $5 = dataset name, $ = numgestures, $2 = numSamples, $4 = numColumns
+# $3 = inputFile (output of last stage), $6 = outputFile (Formatted Data)
+sudo ./generateFormattedDataFile $5 ${#1} $2 $4 "$3.nogyro" $6
 
 # Train/Classify Data
-# $5 = inputFile (output of last stage), $6 = outputFile (Model)
+# $8 = inputFile (output of last stage), $7 = outputFile (Model)
 sudo ./dtwPipeline $5 $6

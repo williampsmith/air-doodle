@@ -63,7 +63,7 @@ while True:
     try:
         while True:
             data = client_sock.recv(1024)
-            if (len(data) == 0): break
+            if (len(data) % 3 != 0): break
             #data = ord(data)
             #data = int(ord(data))
             time.sleep(0.5)

@@ -7,16 +7,20 @@ using namespace std;
 
 int main (int argc, const char * argv[])
 {
-    if (argc < 4) {
+    if (argc < 6) {
         cout << "Not enough arguments! Only got " << argc-1 << " expected 3" << endl;
         return EXIT_FAILURE;
     }
+
+    int numGestures = strtol(argv[2], NULL, 10);
+    int numSamples = strtol(argv[3], NULL, 10);
+    int numCols = strtol(argv[4], NULL, 10);
 
     //Create a new instance of the TimeSeriesClassificationData
     TimeSeriesClassificationData trainingData;
 
     //Set the dimensionality of the data (you need to do this before you can add any samples)
-    trainingData.setNumDimensions( 3 );
+    trainingData.setNumDimensions(numCols);
 
     //You can also give the dataset a name (the name should have no spaces)
     trainingData.setDatasetName(argv[1]);
@@ -28,14 +32,15 @@ int main (int argc, const char * argv[])
     // Classification label --> gesture mapping: 1 --> 0, 2 --> 8, 3 --> 9
     UINT gestureLabel = 1;
     MatrixDouble trainingSample;
+    VectorDouble sample(numCols);
 
-    ifstream infile(argv[2]);
+    ifstream infile(argv[5]);
 
     string line;
-    for (int i = 0; i < 3; i++) { // for each classification index (0, 8 and 9 in our case)
+    for (int i = 0; i < numGestures; i++) { // for each classification index (0, 8 and 9 in our case)
       gestureLabel = i + 1;
 
-      for (int j = 0; j < 20; j++) {
+      for (int j = 0; j < numSamples; j++) {
         trainingSample.clear();
         cout << endl << "Clearing training sample matrix. Size is " << trainingSample.getSize() << endl << endl;
 
@@ -44,29 +49,19 @@ int main (int argc, const char * argv[])
 
         while (getline(infile, line)) {
           cout << "Line retrieved: " << line << endl;
-          if ((line[0] != '%') && line.length() > 3){ // check for empty lines and delimiter lines
+          if ((line[0] != '%') && line.length() > 0){ // check for empty lines and delimiter lines
             //cout << "Creating new training sample." << endl;
-            VectorDouble sample( 3 );
             istringstream iss(line);
-            double x_or, y_or, z_or, x_accel, y_accel, z_accel;
-
-            // get all the data points from the line
-            iss >> x_accel >> y_accel >> z_accel;
-            cout << "Sample:" << endl;
-            //cout /*<< x_or << "  " */ << y_or << "  " << z_or << "  " << x_accel << "  " << y_accel << "  " << z_accel << endl;
 
             // populate the sample vector
-            //sample[0] = x_or;
-            //sample[0] = y_or;
-            //sample[1] = z_or;
-            sample[0] = x_accel;
-            sample[1] = y_accel;
-            sample[2] = z_accel;
+            for (int k = 0; k < numCols; k++) {
+                iss >> sample[k];
+            }
 
             trainingSample.push_back(sample);
             cout << "training sample size: " << trainingSample.getSize() << endl;
           }
-          else if ((line.length() < 2) || ((line[0] != '%') && (line[1] != '%'))) { // reached end of sample
+          else { // reached end of sample
             cout << "\n\n----------- NEW SAMPLE ----------------\n\n";
             break;
           }
@@ -79,7 +74,7 @@ int main (int argc, const char * argv[])
     }
 
     //After recording your training data you can then save it to a file
-    if( !trainingData.saveDatasetToFile(argv[3]) ){
+    if( !trainingData.saveDatasetToFile(argv[6]) ){
         cout << "Failed to save dataset to file!\n";
         return EXIT_FAILURE;
     }
