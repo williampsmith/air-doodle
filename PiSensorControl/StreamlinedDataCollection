@@ -5,4 +5,4 @@
 mkdir $1
 
 # Script: $1 = set, $2 = numSamps, $3 = outSet, $4 = setName, $5 = outFormat, $6 = outTrain
-./StreamlinedDataCollectionScript 089 20 $1/samp.txt Pi_089 $1/ord.txt $1/trained.txt
+./StreamlinedDataCollectionScript 089 10 $1/samp.txt 3 Pi_089 $1/ord.txt $1/trained.txt

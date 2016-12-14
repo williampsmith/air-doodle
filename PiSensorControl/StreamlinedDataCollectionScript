@@ -18,5 +18,5 @@ sudo cut -d " " -f 4- $3 > "$3.nogyro"
 sudo ./generateFormattedDataFile $5 ${#1} $2 $4 "$3.nogyro" $6
 
 # Train/Classify Data
-# $8 = inputFile (output of last stage), $7 = outputFile (Model)
-sudo ./dtwPipeline $5 $6
+# $6 = inputFile (output of last stage), $7 = outputFile (Model)
+sudo ./dtwPipeline $6 $7

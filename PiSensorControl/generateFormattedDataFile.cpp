@@ -45,12 +45,12 @@ int main (int argc, const char * argv[])
         cout << endl << "Clearing training sample matrix. Size is " << trainingSample.getSize() << endl << endl;
 
         getline(infile, line);
-        //cout << "Line retrieved: " << line << endl;
+        cout << "Line retrieved: " << line << endl;
 
         while (getline(infile, line)) {
           cout << "Line retrieved: " << line << endl;
-          if ((line[0] != '%') && line.length() > 0){ // check for empty lines and delimiter lines
-            //cout << "Creating new training sample." << endl;
+          if ((line[0] != '%') && line.length() > 1){ // check for empty lines and delimiter lines
+            cout << "Creating new training sample." << endl;
             istringstream iss(line);
 
             // populate the sample vector
