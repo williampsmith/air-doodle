@@ -102,6 +102,7 @@ void logInput() {
 	// Read BNO055 data until second button press
 	// std::vector<double> vo;
 	std::vector<double> va;
+	// std::vector<double> pos(2,0);
 	digitalWrite(PIN1_LED, HIGH);
 	while (digitalRead(PIN0_BUTTON) != LOW) {
 		// vo = bno055.getVector(bno055.VECTOR_EULER);
@@ -110,8 +111,8 @@ void logInput() {
 		// input_vector[1] = vo[1];
 		// input_vector[2] = vo[2];
 		// input_vector[0] = va[0];
-		// input_vector[1] = va[1];
-		// input_vector[2] = va[2];
+		// pos[0] += 0.5*va[0];
+		// pos[1] += 0.5*va[2];
 		// inputs->matrix.push_back(input_vector);
 		inputs->matrix.push_back(va);
 		// std::cout << vo[1] << " " << vo[2] << " " << va[0] << " " << va[1] << " " << va[2] << std::endl;

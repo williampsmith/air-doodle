@@ -3,9 +3,10 @@
 # Args: $1 Output folder
 
 mkdir $1
+dN=alpha
 
 # Script: $1 = gestures, $2 = numSamps, $3 = outputFile (Raw)
 # 		$4 = numCols
 # 		$5 = setName, $6 = outputFile (Formatted),
 #		$7 = outputFile (Model)
-./StreamlinedDataCollectionScript dleLR 20 $1/dleLR_Raw.txt 3 Pi_dleLR $1/dleLR_Ordered.txt $1/dleLR_Model.txt
+./StreamlinedDataCollectionScript abcdefchijklmnopqrstuvwxyz 20 $1/$dN_Raw.txt 3 Pi_dleLR $1/$dN_Ordered.txt $1/$dN_Model.txt

@@ -17,9 +17,9 @@ int main(int argc, const char * argv[])
   GestureRecognitionPipeline pipeline;
 
   //Add a low pass filter to the pipeline with a dynamic buffer size
-  pipeline << MovingAverageFilter(2, trainingData.getNumDimensions());
+  pipeline << MovingAverageFilter(4, trainingData.getNumDimensions());
   //pipeline << FFT(512, 1, 3);
-  pipeline << deadReckon();
+  //pipeline << deadReckon();
 
   //Add a custom feature extraction algorithm that will use the output of the FFT as input
   // pipeline << MyCustomFeatureAlgorithm();

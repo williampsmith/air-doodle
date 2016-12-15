@@ -33,6 +33,7 @@ int main (int argc, const char * argv[])
     UINT gestureLabel = 0;
     MatrixDouble trainingSample;
     VectorDouble sample(numCols);
+    //VectorDouble pos(numCols, 0);
 
     ifstream infile(argv[5]);
 
@@ -56,9 +57,11 @@ int main (int argc, const char * argv[])
             // populate the sample vector
             for (int k = 0; k < numCols; k++) {
                 iss >> sample[k];
+		//pos[k] += 0.5*sample[k];
             }
 
             trainingSample.push_back(sample);
+            //trainingSample.push_back(pos);
             cout << "training sample size: " << trainingSample.getSize() << endl;
           }
           else { // reached end of sample
