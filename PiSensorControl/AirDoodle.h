@@ -51,7 +51,7 @@
 //	-> Split (multithread to parser for classification and sending while awaiting more input)
 
 // Second Stage Thread Functions
-void irq_handler();	// Handles interrupts and function calls
+void log_isr_handler();	// Handles interrupts and function calls
 void *analyze(void* args);	// Parse input acceleration matrix
 void send(uint8_t* data, uint8_t len);	// Send character and position to waiting edison
 void logInput();	// Response for button interrupt to start logging data

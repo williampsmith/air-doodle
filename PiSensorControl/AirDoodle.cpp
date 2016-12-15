@@ -9,7 +9,7 @@
 // ---------- INTERRUPT FUNCTION -----------
 
 // Handler for the button interrupt
-void irq_handler() {
+void log_isr_handler() {
 	// Attempt to acquire newData lock (if fails we are already collecting so ignore)
 	if (pthread_mutex_trylock(&newData) == 0) {
 		// Begin logging new data
@@ -30,7 +30,7 @@ void send(uint8_t* data, uint8_t len) {
 	// Send [tNum gesture] to awating pi
 	status = write(blue_sock, (char*) data, len);
 	while (status < 0) {
-		std::cout << "Error sending thread " << data[0] << " to server... ";
+		std::cout << "Error sending thread " << unsigned(data[0]) << " to server... ";
 		delay(100);
 		std::cout << "Trying again..." << std::endl;
 		status = write(blue_sock, data, len);
@@ -118,7 +118,7 @@ void logInput() {
 		std::cout << va[0] << " " << va[1] << " " << va[2] << std::endl;
 		// std::cout << input_vector[0] << " " << input_vector[1] << " " << input_vector[2] << " " << input_vector[3] << " " << input_vector[4] << std::endl;
 		// std::cout << std::endl;
-		delay(50);
+		delay(30);
 	}
 	digitalWrite(PIN1_LED, LOW);
 
@@ -151,7 +151,7 @@ void logInput() {
 	// Increment thread counts
 	pthread_mutex_lock(&threads);
 	aliveThreads = aliveThreads + 1;
-	nThread = nThread + 1;
+	nThread = (nThread + 1) % 256;
 	pthread_mutex_unlock(&threads);
 
 	std::cout << "Leaving logInput" << std::endl;
@@ -248,7 +248,7 @@ int main(int argc, char **argv) {
 	}
 
 	// Setup interrupts
-	while (wiringPiISR(PIN0_BUTTON, INT_EDGE_RISING, &irq_handler) < 0 ) {
+	while (wiringPiISR(PIN0_BUTTON, INT_EDGE_RISING, &log_isr_handler) < 0 ) {
     		std::cout << "Unable to setup ISR: " << strerror(errno) << " ... ";
 		delay(500);
 		std::cout << "Trying again..." << std::endl;

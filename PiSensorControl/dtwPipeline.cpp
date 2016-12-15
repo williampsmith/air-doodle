@@ -9,11 +9,15 @@ int main(int argc, const char * argv[])
     return EXIT_FAILURE;
   }
 
+  //Load a labeled data set from a txt file and train a classification model
+  LabelledTimeSeriesClassificationData trainingData;
+  trainingData.load(argv[1]);
+
   // //Setup a custom recognition pipeline
   GestureRecognitionPipeline pipeline;
 
-  //Add a low pass filter to the pipeline with a buffer size of 3 samples and dimension 6
-  pipeline << MovingAverageFilter(4, 3);
+  //Add a low pass filter to the pipeline with a dynamic buffer size
+  pipeline << MovingAverageFilter(4, trainingData.getNumDimensions());
 
   //Add a custom feature extraction algorithm that will use the output of the FFT as input
   // pipeline << MyCustomFeatureAlgorithm();
@@ -23,10 +27,6 @@ int main(int argc, const char * argv[])
   dtw.enableTrimTrainingData(true, 0.01, 90);
   pipeline << dtw;
 
-  //Load a labeled data set from a txt file and train a classification model
-  LabelledTimeSeriesClassificationData trainingData;
-  trainingData.load(argv[1]);
-
   //Use 25% of the training dataset to create a test dataset
   LabelledTimeSeriesClassificationData testData = trainingData.split( 75 );
 
@@ -35,7 +35,7 @@ int main(int argc, const char * argv[])
   // testData.load( "piTrainingData.txt" );
 
 
-  bool success = pipeline.train( trainingData );
+  bool success = pipeline.train(trainingData);
   //bool success;
   if (!success) {
     cout << "Could not train the model." << endl;
