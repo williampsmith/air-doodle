@@ -30,6 +30,12 @@ int main(int argc, const char * argv[])
   //dtw.setOffsetTimeseriesUsingFirstSample(true);
   pipeline << dtw;
 
+  trainingData.eraseAllSamplesWithClassLabel(1);
+  trainingData.eraseAllSamplesWithClassLabel(3);
+  trainingData.eraseAllSamplesWithClassLabel(5);
+  trainingData.eraseAllSamplesWithClassLabel(10);
+  trainingData.eraseAllSamplesWithClassLabel(16);
+
   // Use X% of the training dataset to create a test dataset
   LabelledTimeSeriesClassificationData testData0 = trainingData.split(75);
   //LabelledTimeSeriesClassificationData testData1 = trainingData.split(25);
