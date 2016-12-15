@@ -17,7 +17,7 @@ int main(int argc, const char * argv[])
   GestureRecognitionPipeline pipeline;
 
   //Add a low pass filter to the pipeline with a dynamic buffer size
-  pipeline << MovingAverageFilter(4, trainingData.getNumDimensions());
+//  pipeline << MovingAverageFilter(2, trainingData.getNumDimensions());
 
   //Add a custom feature extraction algorithm that will use the output of the FFT as input
   // pipeline << MyCustomFeatureAlgorithm();
@@ -27,13 +27,8 @@ int main(int argc, const char * argv[])
   dtw.enableTrimTrainingData(true, 0.01, 90);
   pipeline << dtw;
 
-  //Use 25% of the training dataset to create a test dataset
-  LabelledTimeSeriesClassificationData testData = trainingData.split( 75 );
-
-  // // todo: remove. for testing only
-  // LabelledTimeSeriesClassificationData testData;
-  // testData.load( "piTrainingData.txt" );
-
+  // Use X% of the training dataset to create a test dataset
+  LabelledTimeSeriesClassificationData testData = trainingData.split(75);
 
   bool success = pipeline.train(trainingData);
   //bool success;

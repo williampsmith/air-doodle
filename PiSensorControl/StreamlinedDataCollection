@@ -8,4 +8,4 @@ mkdir $1
 # 		$4 = numCols
 # 		$5 = setName, $6 = outputFile (Formatted),
 #		$7 = outputFile (Model)
-./StreamlinedDataCollectionScript 000888999 25 $1/089_Raw.txt 3 Pi_089 $1/089_ord.txt $1/089_trained.txt
+./StreamlinedDataCollectionScript 000888999 25 $1/089_Raw.txt 3 Pi_089 $1/089_Ordered.txt $1/089_Model.txt
