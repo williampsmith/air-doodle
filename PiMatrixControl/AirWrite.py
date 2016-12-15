@@ -5,7 +5,7 @@ import characterBitmapMatrices as lbm
 import matrixAPI as matrix
 
 # gesture dictionary
-gestures = {0 : 'N', 1 : '0', 2 : '8', 3 : '9'}
+gestures = {0 : 'N', 1 : '0', 2 : '8', 3 : '9', 4 : 'd', 5 : 'l', 6 : 'e', 7 : 'L', 8 : 'R'}
 
 def writeCharacter(destination, character, shouldClearDisplay = 1, timeout = 0.04):
     # destination: serial destination such as to Arduino
@@ -74,8 +74,13 @@ while True:
                 print 'Received => Pos: [', pos, ' ] Val: [', gestures[val], ' ] Max Likelihood: [', max_likelihood, ' ]'
 
                 if pos == curr:
-                    if len(display_message) >= 4:
-                        matrix.scrollBitmapMatrixLeftRightOffScreen(arduino, matrix.stringToBitmapMatrix(display_message), numPixels = 32, pixelSkip = 6)
+                    if gestures[val] == 'L':
+                        # scroll left
+                        #matrix.scrollBitmapMatrixLeftRightOffScreen(arduino, matrix.stringToBitmapMatrix(display_message), numPixels = 32, pixelSkip = 6)
+                        display_message = ''
+                    elif gestures[val] == 'R':
+                        #matrix.scrollBitmapMatrixLeftRightOffScreen(arduino, matrix.stringToBitmapMatrix(display_message), numPixels = 32, pixelSkip = 6)
+                        # scroll right
                         display_message = ''
                     display_message += gestures[val]
                     print 'display message:', display_message
