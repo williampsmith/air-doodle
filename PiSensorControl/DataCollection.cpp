@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
 				va = bno055.getVector(bno055.VECTOR_LINEARACCEL);
 				std::cout << vo[0] << "\t" << vo[1] << "\t" << vo[2] << "\t" << va[0] << "\t" << va[1] << "\t" << va[2] << std::endl;
 				ofs << vo[0] << " " << vo[1] << " " << vo[2] << " " << va[0] << " " << va[1] << " " << va[2] << std::endl;
-				delay(30);
+				delay(50);
 			}
 			ofs << std::endl;
 			delay(100);
