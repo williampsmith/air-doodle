@@ -22,6 +22,7 @@ def writeCharacter(destination, character, shouldClearDisplay = 1, timeout = 0.0
     time.sleep(timeout)
 
 def attachCharacterMatrixToBitmapMatrix(characterMatrix):
+    # Attaches one character at the center of the bitmap matrix and returns the bitmap matrix
     width = len(characterMatrix[0])
     height = len(characterMatrix)
     offsetRow = (32 - height) // 2
@@ -35,6 +36,8 @@ def attachCharacterMatrixToBitmapMatrix(characterMatrix):
     return bitmapMatrix
 
 def attachCharacterMatricesToBitmapMatrix(characterMatrices, maxCharWidth, totalWidth, maxCharHeight, totalHeight):
+    # Attaches varying size characters to the current bitmap matrix, appending the characters to existing characters
+    # and returns the bitmap matrix
     offsetRow = (32 - totalHeight) // 2
     offsetCol = (32 - totalWidth) // 2
     totalRowOffset = offsetRow
@@ -59,6 +62,8 @@ def attachCharacterMatricesToBitmapMatrix(characterMatrices, maxCharWidth, total
     return bitmapMatrix
 
 def stringToBitmapMatrix(string):
+    # generates a bitmap matrix of the characters of the string
+    # and returns the bitmap matrix
     size = len(string)
     characterMatrices = []
     totalWidth = 0
@@ -92,9 +97,11 @@ def stringToBitmapMatrix(string):
     return bitmapMatrix
 
 def stringToBitmap(string):
+    # generates a bit string given a string and returns the bit string
     return matrixToBitmap(stringToBitmapMatrix(string))
 
 def matrixToBitmap(bitmapMatrix):
+    # generates a bit string given a bit matrix and returns the bit string
     bitmap = []
     for i in range(32):
         for j in range(4):
@@ -190,6 +197,12 @@ def scrollBitmapMatrixUpDownOffScreen(destination, bitmapMatrix, numPixels = 32,
         time.sleep(period)
     return newBitmapMatrix
 
+def swipeScrollLeftRight(destination, string, direction):
+    # destination: device to send to via serial (e.g. arduino)
+    # string: the string to scroll
+    # direction: -1 means scroll left, 1 means scroll right
+    scrollBitmapMatrixLeftRightOffScreen(destination, stringToBitmapMatrix(string), numPixels = 32, pixelSkip = 6, direction = direction)
+
 # def rotateBitmapMatrix90(bitmapMatrix, direction = -1, x0 = 0, y0 = 0, x1 = 31, y1 = 31):
 #     # This function mutates bitmapMatrix so that it is rotated
 #     # Rotate a matrix by 90 degrees
@@ -270,17 +283,19 @@ time.sleep(1)
 # writeToSerial(arduino, bitmap)
 # bitmapMatrix = scrollBitmapMatrixLeftRightOffScreen(arduino, bitmapMatrix, numPixels = 32, pixelSkip = 4, direction = 1, period = 0.02)
 
-writeToSerial(arduino, stringToBitmap("0"))
-time.sleep(1)
-writeToSerial(arduino, stringToBitmap("8"))
-time.sleep(1)
-writeToSerial(arduino, stringToBitmap("9"))
-time.sleep(1)
-writeToSerial(arduino, stringToBitmap("08"))
-time.sleep(1)
-writeToSerial(arduino, stringToBitmap("89"))
-time.sleep(1)
-scrollBitmapMatrixLeftRightOffScreen(arduino, stringToBitmapMatrix("089"), numPixels = 32, pixelSkip = 6)
+# swipeScrollLeftRight(arduino, "ab", -1)
+
+# writeToSerial(arduino, stringToBitmap("01"))
+# time.sleep(1)
+# writeToSerial(arduino, stringToBitmap("045"))
+# time.sleep(1)
+# writeToSerial(arduino, stringToBitmap("0"))
+# time.sleep(1)
+# writeToSerial(arduino, stringToBitmap("67"))
+# time.sleep(1)
+# writeToSerial(arduino, stringToBitmap("89"))
+# time.sleep(1)
+# scrollBitmapMatrixLeftRightOffScreen(arduino, stringToBitmapMatrix("089"), numPixels = 32, pixelSkip = 6)
 
 # for _ in range(4):
 #     bitmapMatrix = rotateBitmapMatrix90(bitmapMatrix)

@@ -26,7 +26,7 @@ def display(arr):
     result = np.where(arr, '1', ' ')
     print('\n'.join([''.join(row) for row in result]))
 
-for c in ['0', '8', '9']:
+for c in ['5', '6', '7', '8']:
     FONT_PATH = os.environ.get("FONT_PATH", "/Library/Fonts/AppleGothic.ttf")
     arr = char_to_pixels(c, FONT_PATH, fontsize=15)
     print(arr.shape)
