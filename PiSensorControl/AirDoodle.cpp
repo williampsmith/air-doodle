@@ -9,7 +9,7 @@
 // ---------- INTERRUPT FUNCTION -----------
 
 // Handler for the button interrupt
-void irq_handler() {
+void log_isr_handler() {
 	// Attempt to acquire newData lock (if fails we are already collecting so ignore)
 	if (pthread_mutex_trylock(&newData) == 0) {
 		// Begin logging new data
@@ -30,7 +30,7 @@ void send(uint8_t* data, uint8_t len) {
 	// Send [tNum gesture] to awating pi
 	status = write(blue_sock, (char*) data, len);
 	while (status < 0) {
-		std::cout << "Error sending thread " << data[0] << " to server... ";
+		std::cout << "Error sending thread " << unsigned(data[0]) << " to server... ";
 		delay(100);
 		std::cout << "Trying again..." << std::endl;
 		status = write(blue_sock, data, len);
@@ -140,6 +140,8 @@ void logInput() {
 		std::cout << "Not enough data (only " << inputs->matrix.getNumRows() << " rows)" << std::endl;
 		std::cout << std::endl;
 		return;
+	} else if (digitalRead(PIN3_BUTTON) == HIGH) {
+
 	}
 
 	// Create thread struct for split
@@ -248,7 +250,7 @@ int main(int argc, char **argv) {
 	}
 
 	// Setup interrupts
-	while (wiringPiISR(PIN0_BUTTON, INT_EDGE_RISING, &irq_handler) < 0 ) {
+	while (wiringPiISR(PIN0_BUTTON, INT_EDGE_RISING, &log_isr_handler) < 0 ) {
     		std::cout << "Unable to setup ISR: " << strerror(errno) << " ... ";
 		delay(500);
 		std::cout << "Trying again..." << std::endl;
