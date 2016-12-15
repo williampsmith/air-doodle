@@ -9,4 +9,4 @@ dN=alpha
 # 		$4 = numCols
 # 		$5 = setName, $6 = outputFile (Formatted),
 #		$7 = outputFile (Model)
-./StreamlinedDataCollectionScript abcdefchijklmnopqrstuvwxyz 20 $1/$dN_Raw.txt 3 Pi_dleLR $1/$dN_Ordered.txt $1/$dN_Model.txt
+./StreamlinedDataCollectionScript abcdefghijklmnopqrstuvwxyz 20 "$1/$dN_Raw.txt" 3 Pi_dleLR "$1/$dN_Ordered.txt" "$1/$dN_Model.txt"
