@@ -118,7 +118,7 @@ void logInput() {
 		std::cout << va[0] << " " << va[1] << " " << va[2] << std::endl;
 		// std::cout << input_vector[0] << " " << input_vector[1] << " " << input_vector[2] << " " << input_vector[3] << " " << input_vector[4] << std::endl;
 		// std::cout << std::endl;
-		delay(50);
+		delay(30);
 	}
 	digitalWrite(PIN1_LED, LOW);
 
@@ -140,8 +140,6 @@ void logInput() {
 		std::cout << "Not enough data (only " << inputs->matrix.getNumRows() << " rows)" << std::endl;
 		std::cout << std::endl;
 		return;
-	} else if (digitalRead(PIN3_BUTTON) == HIGH) {
-
 	}
 
 	// Create thread struct for split
