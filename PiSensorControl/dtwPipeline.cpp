@@ -17,7 +17,9 @@ int main(int argc, const char * argv[])
   GestureRecognitionPipeline pipeline;
 
   //Add a low pass filter to the pipeline with a dynamic buffer size
-//  pipeline << MovingAverageFilter(2, trainingData.getNumDimensions());
+  pipeline << MovingAverageFilter(2, trainingData.getNumDimensions());
+  //pipeline << FFT(512, 1, 3);
+  pipeline << deadReckon();
 
   //Add a custom feature extraction algorithm that will use the output of the FFT as input
   // pipeline << MyCustomFeatureAlgorithm();
@@ -25,13 +27,19 @@ int main(int argc, const char * argv[])
   //Add a Dynamic Time Warp Classifier and enable trimming
   DTW dtw;
   dtw.enableTrimTrainingData(true, 0.01, 90);
+  //dtw.setOffsetTimeseriesUsingFirstSample(true);
   pipeline << dtw;
 
   // Use X% of the training dataset to create a test dataset
-  LabelledTimeSeriesClassificationData testData = trainingData.split(75);
+  LabelledTimeSeriesClassificationData testData0 = trainingData.split(75);
+  //LabelledTimeSeriesClassificationData testData1 = trainingData.split(25);
+  //LabelledTimeSeriesClassificationData testData2 = trainingData.split(25);
+  //LabelledTimeSeriesClassificationData testData4 = trainingData.split(25);
 
   bool success = pipeline.train(trainingData);
-  //bool success;
+  //success = pipeline.train(testData1);
+  //success = pipeline.train(testData2);
+  //success = pipeline.train(testData1);
   if (!success) {
     cout << "Could not train the model." << endl;
     return EXIT_FAILURE;
@@ -55,10 +63,10 @@ int main(int argc, const char * argv[])
 
   //Use the test dataset to test the pipeline model
   double accuracy = 0;
-  for(UINT i=0; i<testData.getNumSamples(); i++){
+  for(UINT i=0; i<testData0.getNumSamples(); i++){
       //Get the i'th test sample - this is a timeseries
-      UINT classLabel = testData[i].getClassLabel();
-      MatrixDouble timeseries = testData[i].getData();
+      UINT classLabel = testData0[i].getClassLabel();
+      MatrixDouble timeseries = testData0[i].getData();
 
       //Perform a prediction using the classifier
       if( !pipeline.predict( timeseries ) ){
@@ -78,7 +86,7 @@ int main(int argc, const char * argv[])
       cout << "TestSample: " << i <<  "\tClassLabel: " << classLabel << "\tPredictedClassLabel: " << predictedClassLabel << "\tMaximumLikelihood: " << maximumLikelihood << endl;
   }
 
-  cout << "Test Accuracy: " << accuracy/double(testData.getNumSamples())*100.0 << "%" << endl;
+  cout << "Test Accuracy: " << accuracy/double(testData0.getNumSamples())*100.0 << "%" << endl;
 
 
   // --------- UNCOMMENT FOR REAL TIME CLASSIFICATION ------------

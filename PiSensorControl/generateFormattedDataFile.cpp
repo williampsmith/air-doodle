@@ -30,7 +30,7 @@ int main (int argc, const char * argv[])
 
     //Here you would record a time series, when you have finished recording the time series then add the training sample to the training data
     // Classification label --> gesture mapping: 1 --> 0, 2 --> 8, 3 --> 9
-    UINT gestureLabel = 1;
+    UINT gestureLabel = 0;
     MatrixDouble trainingSample;
     VectorDouble sample(numCols);
 
@@ -38,7 +38,7 @@ int main (int argc, const char * argv[])
 
     string line;
     for (int i = 0; i < numGestures; i++) { // for each classification index (0, 8 and 9 in our case)
-      gestureLabel = i + 1;
+      gestureLabel += 1;
 
       for (int j = 0; j < numSamples; j++) {
         trainingSample.clear();
