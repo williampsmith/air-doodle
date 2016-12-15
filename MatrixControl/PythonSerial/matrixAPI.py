@@ -51,7 +51,7 @@ def attachCharacterMatricesToBitmapMatrix(characterMatrices, maxCharWidth, total
         if (totalColOffset + charWidth - 1) > 31:
             totalColOffset = offsetCol
             totalRowOffset += maxCharHeight
-        if totalColOffset + charHeight > 31:
+        if (totalRowOffset + charHeight - 1) > 31:
             break
         for row in range(charHeight):
             for col in range(charWidth):
@@ -80,9 +80,9 @@ def stringToBitmapMatrix(string):
         bitmapMatrixOfCharacter = getBitmapMatrixOfCharacter(character, size)
         characterMatrices.append(bitmapMatrixOfCharacter)
 
-        totalWidth += len(bitmapMatrixOfCharacter[0])
         width = len(bitmapMatrixOfCharacter[0])
         height = len(bitmapMatrixOfCharacter)
+        totalWidth += width
 
         if (width > maxCharWidth):
             maxCharWidth = width
