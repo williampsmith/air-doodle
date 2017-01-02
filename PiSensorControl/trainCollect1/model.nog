@@ -1,0 +1,168 @@
+GRT_PIPELINE_FILE_V3.0
+PipelineMode: CLASSIFICATION_MODE
+NumPreprocessingModules: 1
+NumFeatureExtractionModules: 0
+NumPostprocessingModules: 0
+Trained: 1
+Info: 
+PreProcessingModuleDatatypes:	MovingAverageFilter
+FeatureExtractionModuleDatatypes:
+ClassificationModuleDatatype:	DTW
+PostProcessingModuleDatatypes:
+PreProcessingModule_1
+GRT_MOVING_AVERAGE_FILTER_FILE_V1.0
+NumInputDimensions: 3
+NumOutputDimensions: 3
+FilterSize: 4
+GRT_DTW_Model_File_V2.0
+Trained: 1
+UseScaling: 0
+NumInputDimensions: 3
+NumOutputDimensions: 0
+NumTrainingIterationsToConverge: 3
+MinNumEpochs: 0
+MaxNumEpochs: 100
+ValidationSetSize: 20
+LearningRate: 0.1
+MinChange: 1e-05
+UseValidationSet: 0
+RandomiseTrainingOrder: 1
+UseNullRejection: 0
+ClassifierMode: 1
+NullRejectionCoeff: 3
+NumClasses: 3
+NullRejectionThresholds:  0 0 0
+ClassLabels:  1 3 2
+DistanceMethod: 1
+UseSmoothing: 0
+SmoothingFactor: 5
+UseZNormalisation: 0
+OffsetUsingFirstSample: 0
+ConstrainWarpingPath: 1
+Radius: 0.2
+RejectionMode: 0
+NumberOfTemplates: 3
+OverallAverageTemplateLength: 32
+***************TEMPLATE***************
+Template: 1
+ClassLabel: 1
+TimeSeriesLength: 27
+TemplateThreshold: 237.07
+TrainingMu: 44.4155
+TrainingSigma: 64.2182
+AverageTemplateLength: 25
+TimeSeries: 
+-0.32	-0.075	-0.205	
+-0.276667	-0.01	-0.263333	
+-0.2625	0.0525	-0.2475	
+-0.245	0.13	-0.265	
+-0.245	0.125	-0.1375	
+-0.2225	0.005	-0.1175	
+0.155	-0.0225	0.1125	
+-0.0725	0.715	1.2225	
+-0.17	2.67	0.9225	
+-0.3775	3.9	-0.1525	
+-0.8625	3.7475	-1.56	
+-0.715	1.9075	-4.46	
+-0.745	-1.3375	-5.3275	
+-0.74	-4.0525	-4.94	
+-0.835	-5.475	-3.52	
+-0.865	-5.8875	-0.965	
+-0.9025	-6.105	2.105	
+-0.735	-5.395	5.655	
+-0.7725	-3.655	8.045	
+-0.91	-1.54	8.9525	
+-1.44	0.935	7.985	
+-2.32	3.4225	5.37	
+-2.7275	4.595	1.695	
+-2.635	4.8775	-1.53	
+-2.165	3.8775	-4.22	
+-1.3175	1.8725	-5.655	
+-0.69	-0.1775	-5.2125	
+***************TEMPLATE***************
+Template: 2
+ClassLabel: 3
+TimeSeriesLength: 30
+TemplateThreshold: 338.382
+TrainingMu: 47.1869
+TrainingSigma: 97.0651
+AverageTemplateLength: 33
+TimeSeries: 
+-0.505	-0.055	0.065	
+-0.473333	0.0166667	-0.00333333	
+-0.44	-0.04	-0.015	
+-0.435	-0.0275	0.07	
+-0.425	-0.02	0.125	
+0.175	-0.325	1.04	
+0.0325	-0.135	3.42	
+-0.765	1.595	4.245	
+-1.4275	2.7275	3.95	
+-2.2325	3.9625	1.725	
+-2.24	4.61	-2.535	
+-1.3475	2.7075	-5.6	
+-0.8625	0.7325	-7.4075	
+-0.625	-2.145	-7.7025	
+-0.655	-4.8975	-6.0575	
+-0.9175	-6.88	-3.5675	
+-0.7525	-7.535	-0.49	
+-0.925	-7.0275	2.6925	
+-1.58	-5.4425	5.895	
+-2.0325	-2.585	8.4425	
+-2.615	-0.0325	9.38	
+-3.2425	2.5525	8.5675	
+-3.08	3.8375	4.9275	
+-2.6525	3.745	-0.4225	
+-1.9425	2.96	-5.4175	
+-0.7075	2.1725	-9.405	
+-0.1025	1.1375	-11.5125	
+-0.4825	0.67	-10.5675	
+-0.745	0.28	-8.9975	
+-1.805	-0.29	-5.0525	
+***************TEMPLATE***************
+Template: 3
+ClassLabel: 2
+TimeSeriesLength: 39
+TemplateThreshold: 377.136
+TrainingMu: 77.2385
+TrainingSigma: 99.9659
+AverageTemplateLength: 39
+TimeSeries: 
+-0.225	0.06	-0.24	
+-0.25	0.03	-0.19	
+-0.2275	0.08	-0.2675	
+-0.1925	0.08	-0.2625	
+-0.2025	0.095	-0.225	
+-0.18	0.2	-0.3875	
+-0.2225	0.47	-0.2875	
+-0.4325	1.985	-0.62	
+-0.59	3.7075	0.51	
+-0.745	4.0075	2.57	
+-0.8325	3.4025	3.965	
+-0.765	0.565	4.89	
+-0.57	-3.4425	3.2925	
+0.2325	-6.72	0.1475	
+0.7225	-8.9225	-2.5925	
+0.8125	-10.115	-4.23	
+-0.07	-9.1325	-3.06	
+-2.0825	-4.97	0.2425	
+-3.7075	-0.05	3.215	
+-4.9225	5.73	5.43	
+-4.885	10.1425	5.1775	
+-4.3675	10.795	2.805	
+-3.76	8.92	0.2975	
+-3.155	6.12	-2.47	
+-2.2975	2.7025	-4.9525	
+-1.5125	-0.2075	-6.85	
+-0.33	-3.305	-7.375	
+0.755	-6.3	-6.3625	
+0.745	-8.98	-4.4725	
+0.715	-10.305	-1.9525	
+-0.7	-8.42	0.125	
+-1.8625	-5.5275	1.1975	
+-2.525	-0.1875	1.19	
+-3.265	4.265	1.4625	
+-2.4875	6.615	1.0275	
+-1.825	8.0725	0.84	
+-1.265	6.4275	1.7075	
+-0.455	4.6875	1.91	
+-0.62	2.5175	2.665	

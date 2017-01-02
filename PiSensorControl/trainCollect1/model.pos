@@ -1,0 +1,160 @@
+GRT_PIPELINE_FILE_V3.0
+PipelineMode: CLASSIFICATION_MODE
+NumPreprocessingModules: 1
+NumFeatureExtractionModules: 0
+NumPostprocessingModules: 0
+Trained: 1
+Info: 
+PreProcessingModuleDatatypes:	MovingAverageFilter
+FeatureExtractionModuleDatatypes:
+ClassificationModuleDatatype:	DTW
+PostProcessingModuleDatatypes:
+PreProcessingModule_1
+GRT_MOVING_AVERAGE_FILTER_FILE_V1.0
+NumInputDimensions: 3
+NumOutputDimensions: 3
+FilterSize: 2
+GRT_DTW_Model_File_V2.0
+Trained: 1
+UseScaling: 0
+NumInputDimensions: 3
+NumOutputDimensions: 0
+NumTrainingIterationsToConverge: 3
+MinNumEpochs: 0
+MaxNumEpochs: 100
+ValidationSetSize: 20
+LearningRate: 0.1
+MinChange: 1e-05
+UseValidationSet: 0
+RandomiseTrainingOrder: 1
+UseNullRejection: 0
+ClassifierMode: 1
+NullRejectionCoeff: 3
+NumClasses: 3
+NullRejectionThresholds:  0 0 0
+ClassLabels:  1 2 3
+DistanceMethod: 1
+UseSmoothing: 0
+SmoothingFactor: 5
+UseZNormalisation: 0
+OffsetUsingFirstSample: 0
+ConstrainWarpingPath: 1
+Radius: 0.2
+RejectionMode: 0
+NumberOfTemplates: 3
+OverallAverageTemplateLength: 32
+***************TEMPLATE***************
+Template: 1
+ClassLabel: 1
+TimeSeriesLength: 19
+TemplateThreshold: 2490.72
+TrainingMu: 1106.63
+TrainingSigma: 461.363
+AverageTemplateLength: 26
+TimeSeries: 
+78.5	6.75	1.5625	
+78.405	8.845	2.96	
+78.095	11.255	3.2675	
+77.7125	13.08	2.0375	
+77.485	14.6825	-0.58	
+77.195	14.3275	-4.3675	
+158.748	11.7075	-8.59	
+240.387	7.9125	-11.53	
+240.145	4.1475	-11.825	
+239.822	0.7175	-9.5075	
+239.572	-3.125	-5.1875	
+239.218	-5.2925	-0.21	
+238.31	-5.1875	4.4725	
+236.925	-3.3075	8.45	
+235.4	-0.21	11.2175	
+233.913	3.265	12.54	
+232.558	5.995	11.64	
+231.843	7.3275	8.52	
+231.673	7.605	4.905	
+***************TEMPLATE***************
+Template: 2
+ClassLabel: 2
+TimeSeriesLength: 39
+TemplateThreshold: 10041
+TrainingMu: 3067.25
+TrainingSigma: 2324.59
+AverageTemplateLength: 39
+TimeSeries: 
+121.23	-24.48	-29.3775	
+121.105	-24.4275	-29.4725	
+120.99	-24.3775	-29.62	
+120.922	-24.35	-29.7875	
+120.835	-24.305	-29.865	
+120.722	-24.1325	-30.085	
+120.588	-23.7075	-30.295	
+120.267	-21.895	-30.695	
+119.812	-18.6125	-29.975	
+119.388	-16.4175	-27.005	
+119.01	-16.2975	-23.76	
+118.67	-17.9275	-21.84	
+118.477	-21.49	-21.7925	
+119.05	-26.58	-23.565	
+119.965	-31.94	-26.205	
+120.205	-36.965	-28.6625	
+119.22	-40.7375	-29.0825	
+116.898	-40.6825	-26.3825	
+114.175	-36.96	-22.7475	
+111.575	-31.285	-20.0175	
+109.412	-24.865	-18.475	
+107.645	-19.745	-18.4	
+106.047	-17.245	-19.645	
+104.66	-16.245	-22.19	
+103.96	-16.0425	-25.8975	
+103.835	-17.25	-30.2025	
+104.205	-20.7575	-33.87	
+105.085	-25.85	-35.9275	
+105.46	-31.3225	-36.7325	
+105.295	-36.535	-36.6275	
+104.22	-39.4825	-35.6975	
+102.523	-39.7975	-34.605	
+101.072	-37.0375	-34.345	
+99.505	-32.4575	-33.975	
+98.4675	-28.6025	-33.2075	
+98.21	-25.11	-32.7375	
+97.9825	-22.5375	-31.7975	
+97.785	-21.3425	-30.3575	
+97.3925	-21.3975	-28.6325	
+***************TEMPLATE***************
+Template: 3
+ClassLabel: 3
+TimeSeriesLength: 30
+TemplateThreshold: 4410.93
+TrainingMu: 1522.05
+TrainingSigma: 962.959
+AverageTemplateLength: 33
+TimeSeries: 
+-384.857	288.6	-88.8525	
+-385.102	288.595	-88.805	
+-385.29	288.582	-88.8525	
+-385.48	288.56	-88.83	
+-385.717	288.553	-88.6575	
+-385.353	288.25	-87.64	
+-385.082	288.123	-84.3925	
+-386.212	290.02	-81.165	
+-387.91	292.875	-80.4625	
+-389.012	294.94	-81.965	
+-389.555	296.695	-85.2025	
+-389.8	297.337	-89.3	
+-390.12	296.315	-93.47	
+-390.5	293.528	-97.075	
+-390.835	289.653	-98.9625	
+-391.373	285.56	-98.925	
+-391.79	281.9	-97.5275	
+-392.178	278.965	-94.8725	
+-393.34	277.183	-90.375	
+-394.985	277.533	-84.5875	
+-396.438	279.283	-79.705	
+-398.035	281.485	-76.925	
+-399.663	283.572	-76.88	
+-400.717	285.115	-80.0825	
+-401.033	285.988	-85.545	
+-400.685	286.618	-91.7475	
+-400.472	286.882	-97.7975	
+-401.303	286.923	-102.162	
+-402.26	286.938	-105.11	
+-403.235	286.607	-105.797	

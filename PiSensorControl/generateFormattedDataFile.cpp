@@ -30,15 +30,16 @@ int main (int argc, const char * argv[])
 
     //Here you would record a time series, when you have finished recording the time series then add the training sample to the training data
     // Classification label --> gesture mapping: 1 --> 0, 2 --> 8, 3 --> 9
-    UINT gestureLabel = 1;
+    UINT gestureLabel = 0;
     MatrixDouble trainingSample;
     VectorDouble sample(numCols);
+    //VectorDouble pos(numCols, 0);
 
     ifstream infile(argv[5]);
 
     string line;
     for (int i = 0; i < numGestures; i++) { // for each classification index (0, 8 and 9 in our case)
-      gestureLabel = i + 1;
+      gestureLabel += 1;
 
       for (int j = 0; j < numSamples; j++) {
         trainingSample.clear();
@@ -56,9 +57,11 @@ int main (int argc, const char * argv[])
             // populate the sample vector
             for (int k = 0; k < numCols; k++) {
                 iss >> sample[k];
+		//pos[k] += 0.5*sample[k];
             }
 
             trainingSample.push_back(sample);
+            //trainingSample.push_back(pos);
             cout << "training sample size: " << trainingSample.getSize() << endl;
           }
           else { // reached end of sample
